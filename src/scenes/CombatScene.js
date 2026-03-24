@@ -168,9 +168,6 @@ export class CombatScene extends Phaser.Scene {
 
     this.handSprites = [];
 
-    // Enemy highlight for drag
-    this.enemyHighlight = this.add.rectangle(width / 2, 155, 200, 200, 0xffffff, 0)
-      .setStrokeStyle(0, 0xffffff).setDepth(5);
 
     this.createRelicDisplay();
     this.createPotionUI();
@@ -630,20 +627,42 @@ export class CombatScene extends Phaser.Scene {
   createSlancioUI() {
     const y = 24;
     const x = 450;
+    this.slancioBg = this.add.rectangle(x, y, 82, 28, 0x2a0f0f, 0.9)
+      .setStrokeStyle(1, C.bgPanelDark).setDepth(71).setAlpha(0)
+      .setInteractive({ useHandCursor: false });
     this.slancioLabel = this.add.text(x - 28, y, 'SLANCIO', {
       fontFamily: F, fontSize: '7px', color: '#e85d5d', fontStyle: '700', letterSpacing: 1
-    }).setOrigin(0, 0.5).setDepth(71).setAlpha(0);
+    }).setOrigin(0, 0.5).setDepth(72).setAlpha(0);
     this.slancioText = this.add.text(x + 22, y, '', {
       fontFamily: F, fontSize: '15px', color: '#e85d5d', fontStyle: '900'
     }).setOrigin(0.5, 0.5).setDepth(72).setAlpha(0);
+
+    this.slancioBg.on('pointerover', () => {
+      this.relicTooltip?.destroy();
+      this.relicTooltipBg?.destroy();
+      this.relicTooltipBg = this.add.rectangle(x, y + 38, 230, 44, C.bgPanelDark, 0.97)
+        .setStrokeStyle(1, C.hp).setDepth(150);
+      this.relicTooltip = this.add.text(x, y + 38,
+        '⚡ Attacchi consecutivi moltiplicano il danno.\nSi azzera giocando carte non-attacco.', {
+        fontFamily: F, fontSize: '10px', color: '#e87070', align: 'center', wordWrap: { width: 215 }
+      }).setOrigin(0.5).setDepth(151);
+    });
+    this.slancioBg.on('pointerout', () => {
+      this.relicTooltip?.destroy();
+      this.relicTooltipBg?.destroy();
+      this.relicTooltip = null;
+      this.relicTooltipBg = null;
+    });
   }
 
   updateSlancioUI() {
     const count = this.combat.slancioCount;
     if (count > 0) {
+      this.slancioBg.setAlpha(1);
       this.slancioLabel.setAlpha(1);
       this.slancioText.setText(String(count)).setAlpha(1);
     } else {
+      this.slancioBg.setAlpha(0);
       this.slancioLabel.setAlpha(0);
       this.slancioText.setAlpha(0);
     }
@@ -674,9 +693,21 @@ export class CombatScene extends Phaser.Scene {
     });
     this.caricaBg.on('pointerover', () => {
       if (this.combat.caricaPoints > 0) this.caricaBg.setFillStyle(C.btnHover, 0.9);
+      this.relicTooltip?.destroy();
+      this.relicTooltipBg?.destroy();
+      this.relicTooltipBg = this.add.rectangle(x, y + 38, 230, 44, C.bgPanelDark, 0.97)
+        .setStrokeStyle(1, C.mana).setDepth(150);
+      this.relicTooltip = this.add.text(x, y + 38,
+        '💥 Clicca per attivare: il prossimo attacco\ninfligge +5 danni per ogni punto accumulato.', {
+        fontFamily: F, fontSize: '10px', color: '#7bb5e8', align: 'center', wordWrap: { width: 215 }
+      }).setOrigin(0.5).setDepth(151);
     });
     this.caricaBg.on('pointerout', () => {
       this.caricaBg.setFillStyle(this.caricaActive ? C.btnHover : C.defendDark, 0.9);
+      this.relicTooltip?.destroy();
+      this.relicTooltipBg?.destroy();
+      this.relicTooltip = null;
+      this.relicTooltipBg = null;
     });
   }
 
@@ -867,11 +898,6 @@ export class CombatScene extends Phaser.Scene {
       borderWidth: 2,
       depth: 2
     });
-
-    // Compatibilità: enemyBox per riferimenti drag/drop
-    // (usiamo un rectangle invisibile per logica di hit)
-    this.enemyBox = this.add.rectangle(panelX, panelY, panelW, panelH, 0x000000, 0)
-      .setDepth(3);
 
     // ── Intent display (sopra il pannello) ────────────────────────────────
     const intentY = 68;
@@ -1976,7 +2002,6 @@ export class CombatScene extends Phaser.Scene {
     // Enemy death animation — fade out container + "SCONFITTO!" al centro
     const deathTargets = [];
     if (this.enemyImg && this.enemyImg.active) deathTargets.push(this.enemyImg);
-    if (this.enemyBox && this.enemyBox.active) deathTargets.push(this.enemyBox);
 
     if (deathTargets.length > 0) {
       this.tweens.add({
@@ -2129,34 +2154,12 @@ export class CombatScene extends Phaser.Scene {
       gameObject.setRotation(0);
 
       const card = gameObject.cardModel;
-      const canPlay = card && card.canPlay(this.player.energy);
-      if (canPlay && card.type === 'attack') {
-        this.enemyHighlight.setStrokeStyle(2, C.hp, 0.6);
-        // Bordo pannello nemico evidenziato
-        if (this._enemyPanelGfx) {
-          this._enemyPanelGfx.lineStyle(3, C.hp, 1);
-        }
-      }
     });
 
     this.input.on('drag', (pointer, gameObject, dragX, dragY) => {
       if (this.isAnimating) return;
       gameObject.x = dragX;
       gameObject.y = dragY;
-
-      const card = gameObject.cardModel;
-      if (!card) return;
-
-      if (card.type === 'attack') {
-        const overEnemy = Phaser.Geom.Rectangle.Contains(this.enemyBounds, dragX, dragY);
-        if (overEnemy) {
-          this.enemyBox.setFillStyle(C.hpDark, 0.5);
-          this.enemyBox.setStrokeStyle(3, C.hp);
-        } else {
-          this.enemyBox.setFillStyle(0x000000, 0);
-          this.enemyBox.setStrokeStyle(0, 0x000000);
-        }
-      }
     });
 
     this.input.on('dragend', (pointer, gameObject) => {
@@ -2164,10 +2167,6 @@ export class CombatScene extends Phaser.Scene {
         gameObject.returnToPosition();
         return;
       }
-
-      this.enemyHighlight.setStrokeStyle(0, 0xffffff);
-      this.enemyBox.setFillStyle(0x000000, 0);
-      this.enemyBox.setStrokeStyle(0, 0x000000);
 
       const card = gameObject.cardModel;
       if (!card) {
@@ -2353,6 +2352,8 @@ export class CombatScene extends Phaser.Scene {
       { term: 'DEF  Difesa / Blocco', desc: 'Riduce i danni subiti questo turno. Si azzera ad ogni turno.' },
       { term: 'STR  Forza',           desc: 'Ogni punto di forza aggiunge +1 danno ad ogni attacco.' },
       { term: 'EN   Energia',         desc: 'Serve per giocare le carte. Si ripristina ad ogni turno.' },
+      { term: '⚡ Slancio',           desc: 'Ogni carta attacco giocata di fila aumenta lo Slancio. Il danno dell\'attacco successivo viene moltiplicato per lo Slancio. Si azzera se giochi una carta non-attacco.' },
+      { term: '💥 Carica',           desc: 'Alcune carte accumlano punti Carica. Clicca il badge CARICA per attivarlo: il prossimo attacco infligge +5 danni per ogni punto accumulato.' },
       { term: '☠ Veleno',             desc: 'Infligge N danni a fine turno al nemico, poi si riduce di 1.' },
       { term: '🔥 Bruciatura',        desc: 'Infligge N danni fissi a fine turno al nemico, poi si azzera.' },
       { term: '💫 Stordimento',       desc: 'Il nemico salta il prossimo turno.' },
