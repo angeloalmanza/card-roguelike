@@ -1,0 +1,10 @@
+services:
+  game:
+    build: .
+    ports:
+      - "5174:5174"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
