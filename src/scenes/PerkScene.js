@@ -50,7 +50,8 @@ export class PerkScene extends Phaser.Scene {
     this._t = t;
 
     // ── Sfondo ────────────────────────────────────────────────────────────────
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
+    this.add.image(width / 2, height / 2, 'bg-secondary').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
 
     const bgGlow = this.add.graphics();
     bgGlow.fillStyle(0x1a1a30, 0.25);

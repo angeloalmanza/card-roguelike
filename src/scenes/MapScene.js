@@ -295,7 +295,8 @@ export class MapScene extends Phaser.Scene {
     SaveManager.saveRun(this.runData);
 
     // Background
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
+    this.add.image(width / 2, height / 2, 'bg-map').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.6);
 
     // Dot grid per profondità
     const dotGrid = this.add.graphics().setDepth(1);

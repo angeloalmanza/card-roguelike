@@ -477,25 +477,13 @@ export class CombatScene extends Phaser.Scene {
     const { width, height } = this.scale;
 
     // Sfondo principale
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg).setDepth(-2);
+    const bgKey = this.nodeType === 'boss' ? 'bg-combat-boss'
+                : this.nodeType === 'elite' ? 'bg-combat-elite'
+                : 'bg-combat';
+    this.add.image(width / 2, height / 2, bgKey).setDisplaySize(width, height).setDepth(-2);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.5).setDepth(-2);
 
-    const g = this.add.graphics().setDepth(-1);
-
-    // Zona nemico — pannello scuro
-    g.fillStyle(C.bgPanelDark, 0.85);
-    g.fillRect(0, 52, width, 250);
-
-    // Zona giocatore — leggermente più chiara
-    g.fillStyle(C.bgPanel, 0.5);
-    g.fillRect(0, 275, width, height - 275);
-
-    // Vignette laterali
-    g.fillGradientStyle(C.bg, C.bg, C.bg, C.bg, 0.8, 0, 0, 0.8);
-    g.fillRect(0, 0, 70, height);
-    g.fillGradientStyle(C.bg, C.bg, C.bg, C.bg, 0, 0.8, 0.8, 0);
-    g.fillRect(width - 70, 0, 70, height);
-
-    // Linea separatrice dorata
+    // Linea separatrice dorata nemico/giocatore
     drawDivider(this, width / 2, 270, width - 80, { color: C.borderGoldDim, alpha: 0.6, depth: 0 });
     drawDivider(this, width / 2, 272, width - 80, { color: C.borderGold, alpha: 0.15, depth: 0 });
   }
@@ -1127,17 +1115,8 @@ export class CombatScene extends Phaser.Scene {
     this.enemyBorderColor = this.nodeType === 'boss' ? C.hp : this.nodeType === 'elite' ? C.borderGold : C.borderSubtle;
 
     // Glow esterno
-    this.add.circle(panelX, panelY, 130, glowColor, 0.06).setDepth(1);
-    this.add.circle(panelX, panelY, 85, glowColor, 0.10).setDepth(1);
-
-    // Pannello principale — drawPanel
-    this._enemyPanelGfx = drawPanel(this, panelX, panelY, panelW, panelH, {
-      radius: 12,
-      fill: C.bgPanel,
-      border: this.enemyBorderColor,
-      borderWidth: 2,
-      depth: 2
-    });
+    this.add.circle(panelX, panelY, 130, glowColor, 0.08).setDepth(1);
+    this.add.circle(panelX, panelY, 85, glowColor, 0.14).setDepth(1);
 
     // ── Intent display (sopra il pannello) ────────────────────────────────
     const intentY = 68;

@@ -90,7 +90,8 @@ export class StatsScene extends Phaser.Scene {
   // ----------------------------------------------------------------
   _buildBackground(width, height) {
     // Sfondo principale
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
+    this.add.image(width / 2, height / 2, 'bg-secondary').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
 
     // Header bar
     drawPanel(this, width / 2, 40, width, 80, {

@@ -58,19 +58,8 @@ export class MainMenuScene extends Phaser.Scene {
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
     // ── Sfondo base ──────────────────────────────────────────────────────────
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
-
-    // Cerchio luminoso centrale
-    const bgGlow = this.add.graphics();
-    bgGlow.fillStyle(0x1a2040, 0.3);
-    bgGlow.fillCircle(width / 2, height / 2, 400);
-
-    // Vignetta scura agli angoli
-    const vignette = this.add.graphics();
-    vignette.fillStyle(0x000000, 0.4);
-    vignette.fillRect(0, 0, width, height);
-    vignette.fillStyle(C.bg, 1);
-    vignette.fillCircle(width / 2, height / 2, Math.max(width, height) * 0.7);
+    this.add.image(width / 2, height / 2, 'bg-menu').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.45);
 
     // Linea accent superiore dorata
     this.add.rectangle(width / 2, 0, width, 2, C.borderGold).setOrigin(0.5, 0);
@@ -208,12 +197,15 @@ export class MainMenuScene extends Phaser.Scene {
 
     const footerH = 36;
     const footerY = height - footerH / 2 - 10;
-    drawPanel(this, width / 2, footerY, width - 40, footerH, {
-      fill: C.bgPanelDark,
-      border: C.borderSubtle,
-      borderWidth: 1,
-      radius: 8,
-    });
+
+    if (stats.totalRuns > 0) {
+      drawPanel(this, width / 2, footerY, width - 40, footerH, {
+        fill: C.bgPanelDark,
+        border: C.borderSubtle,
+        borderWidth: 1,
+        radius: 8,
+      });
+    }
 
     if (stats.totalRuns > 0) {
       const statsLine = [
@@ -233,12 +225,6 @@ export class MainMenuScene extends Phaser.Scene {
         fontFamily: FONT_BODY,
         fontSize: '11px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
-      }).setOrigin(0.5);
-    } else {
-      this.add.text(width / 2, footerY, t('fattoConPhaser'), {
-        fontFamily: FONT_BODY,
-        fontSize: '10px',
-        color: '#' + C.borderSubtle.toString(16).padStart(6, '0'),
       }).setOrigin(0.5);
     }
   }

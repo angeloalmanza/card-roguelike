@@ -40,7 +40,8 @@ export class GlossaryScene extends Phaser.Scene {
     this._t = k => (T[lang] || T.it)[k] ?? T.it[k];
 
     // Sfondo
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
+    this.add.image(width / 2, height / 2, 'bg-secondary').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65);
 
     // Header panel
     drawPanel(this, width / 2, 40, width, 80, {

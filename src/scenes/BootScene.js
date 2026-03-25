@@ -32,6 +32,12 @@ export class BootScene extends Phaser.Scene {
     // Audio procedurale via Web Audio API — nessun file da caricare.
     // SoundManager è disponibile come singleton importabile da qualsiasi scena.
 
+    // Dungeon backgrounds
+    ['bg-menu', 'bg-map', 'bg-combat', 'bg-combat-elite', 'bg-combat-boss',
+     'bg-reward', 'bg-classselect', 'bg-secondary'].forEach(key => {
+      this.load.image(key, `assets/backgrounds/${key}.png`);
+    });
+
     // Card assets (layered image approach)
     const cardTypes = ['attack', 'defend', 'skill', 'curse'];
     cardTypes.forEach(type => {

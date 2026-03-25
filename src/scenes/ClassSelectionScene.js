@@ -82,7 +82,8 @@ export class ClassSelectionScene extends Phaser.Scene {
     const victories = SaveManager.getStats().victories || 0;
 
     // ── Sfondo ────────────────────────────────────────────────────────────────
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
+    this.add.image(width / 2, height / 2, 'bg-classselect').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.55);
 
     const bgGlow = this.add.graphics();
     bgGlow.fillStyle(0x1a2040, 0.2);

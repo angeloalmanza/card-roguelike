@@ -65,7 +65,8 @@ export class SettingsScene extends Phaser.Scene {
 
     this._settings = SaveManager.getSettings();
 
-    this.add.rectangle(cx, cy, W, H, 0x000000, 0.6).setDepth(0);
+    this.add.image(cx, cy, 'bg-secondary').setDisplaySize(W, H).setDepth(0);
+    this.add.rectangle(cx, cy, W, H, 0x000000, 0.72).setDepth(0);
 
     const panW = 600;
     const panH = 540;

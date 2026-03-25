@@ -55,7 +55,8 @@ export class RewardScene extends Phaser.Scene {
     this._t = t;
 
     // Sfondo
-    this.add.rectangle(width / 2, height / 2, width, height, C.bg);
+    this.add.image(width / 2, height / 2, 'bg-reward').setDisplaySize(width, height);
+    this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.55);
 
     // Header panel
     drawPanel(this, width / 2, 44, width, 88, {
