@@ -8,6 +8,23 @@
  * Il salvataggio avviene automaticamente ogni volta che il giocatore
  * torna alla mappa (dopo combattimenti, eventi, ecc.)
  */
+import { STARTER_DECK, REWARD_CARDS, CURSES } from '../data/cards.js';
+import { CLASSES } from '../data/classes.js';
+
+/**
+ * Costruisce una mappa: nome italiano → oggetto carta con nameEn/descriptionEn.
+ * Usata per arricchire le carte caricate da save vecchi che mancano dei campi inglesi.
+ */
+function buildCardLookup() {
+  const map = new Map();
+  const addCard = c => { if (c.name && !map.has(c.name)) map.set(c.name, c); };
+  STARTER_DECK.forEach(addCard);
+  CURSES.forEach(addCard);
+  ['common', 'uncommon', 'rare'].forEach(tier => (REWARD_CARDS[tier] || []).forEach(addCard));
+  CLASSES.forEach(cls => (cls.starterDeck || []).forEach(addCard));
+  return map;
+}
+
 const SAVE_KEY        = 'cardRoguelike_save';
 const STATS_KEY       = 'cardRoguelike_stats';
 const COLLECTION_KEY  = 'cardRoguelike_collection';
@@ -46,12 +63,25 @@ export class SaveManager {
 
   /**
    * Carica la run salvata. Ritorna null se non c'è.
+   * Arricchisce le carte con i campi inglesi se mancanti (compatibilità con save precedenti).
    */
   static loadRun() {
     try {
       const data = localStorage.getItem(SAVE_KEY);
       if (!data) return null;
-      return JSON.parse(data);
+      const parsed = JSON.parse(data);
+      // Enrich cards with English translations if missing
+      if (parsed.deckCards) {
+        const lookup = buildCardLookup();
+        parsed.deckCards = parsed.deckCards.map(card => {
+          if (!card.nameEn && lookup.has(card.name)) {
+            const master = lookup.get(card.name);
+            return { ...card, nameEn: master.nameEn, descriptionEn: master.descriptionEn };
+          }
+          return card;
+        });
+      }
+      return parsed;
     } catch (e) {
       console.warn('Caricamento fallito:', e);
       return null;

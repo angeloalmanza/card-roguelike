@@ -1,6 +1,36 @@
 import Phaser from 'phaser';
 import { PerkManager, PERK_DEFINITIONS } from '../managers/PerkManager.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    header:        'ALBERO ABILITÀ',
+    subheader:     'Sblocca abilità permanenti che persistono tra le run',
+    indietro:      'INDIETRO',
+    livello:       (n) => `LIVELLO ${n}`,
+    footerNote:    'Guadagni 1 punto abilità alla fine di ogni run (vittoria o sconfitta)',
+    puntiDisp:     (pts) => `${pts} punto${pts !== 1 ? 'i' : ''} disponibile${pts !== 1 ? 'i' : ''}`,
+    sbloccato:     '✓ SBLOCCATO',
+    bloccato:      '🔒 BLOCCATO',
+    costo:         (pts) => `Costo: ${pts} punto${pts !== 1 ? 'i' : ''}`,
+    puntiInsuff:   'Punti insufficienti!',
+    sbloccatoMsg:  (emoji, name) => `${emoji} ${name} sbloccato!`,
+  },
+  en: {
+    header:        'ABILITY TREE',
+    subheader:     'Unlock permanent abilities that persist between runs',
+    indietro:      'BACK',
+    livello:       (n) => `LEVEL ${n}`,
+    footerNote:    'Earn 1 ability point at the end of every run (win or loss)',
+    puntiDisp:     (pts) => `${pts} point${pts !== 1 ? 's' : ''} available`,
+    sbloccato:     '✓ UNLOCKED',
+    bloccato:      '🔒 LOCKED',
+    costo:         (pts) => `Cost: ${pts} point${pts !== 1 ? 's' : ''}`,
+    puntiInsuff:   'Insufficient points!',
+    sbloccatoMsg:  (emoji, name) => `${emoji} ${name} unlocked!`,
+  },
+};
 
 /**
  * PerkScene — Albero abilità passivo (Perk System).
@@ -15,6 +45,9 @@ export class PerkScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this._transitioning = false;
     this.cameras.main.fadeIn(400, 0, 0, 0);
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
+    this._t = t;
 
     // ── Sfondo ────────────────────────────────────────────────────────────────
     this.add.rectangle(width / 2, height / 2, width, height, C.bg);
@@ -33,21 +66,21 @@ export class PerkScene extends Phaser.Scene {
     this.add.rectangle(width / 2, 0, width, 2, C.borderGold).setOrigin(0.5, 0);
 
     // ── Header ────────────────────────────────────────────────────────────────
-    this.add.text(width / 2, 42, 'ALBERO ABILITÀ', {
+    this.add.text(width / 2, 42, t('header'), {
       fontFamily: FONT_TITLE,
       fontSize: '28px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
       letterSpacing: 5,
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 74, 'Sblocca abilità permanenti che persistono tra le run', {
+    this.add.text(width / 2, 74, t('subheader'), {
       fontFamily: FONT_UI,
       fontSize: '12px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
     }).setOrigin(0.5);
 
     // Bottone indietro
-    createButton(this, 90, 42, 140, 36, 'INDIETRO', {
+    createButton(this, 90, 42, 140, 36, t('indietro'), {
       fill: C.bgPanel,
       hover: C.btnHover,
       border: C.borderGold,
@@ -72,20 +105,20 @@ export class PerkScene extends Phaser.Scene {
     drawDivider(this, width / 2, 96, width - 80, { color: C.borderSubtle, alpha: 0.5 });
 
     // ── Livello 1 ─────────────────────────────────────────────────────────────
-    this._drawLevelLabel(width / 2, 110, 'LIVELLO 1');
-    this._drawLevel(1, PERK_DEFINITIONS.filter(p => p.level === 1), 128);
+    this._drawLevelLabel(width / 2, 110, t('livello')(1));
+    this._drawLevel(1, PERK_DEFINITIONS.filter(p => p.level === 1), 128, t);
 
     drawDivider(this, width / 2, 308, width - 100, { color: C.borderSubtle, alpha: 0.3 });
-    this._drawLevelLabel(width / 2, 320, 'LIVELLO 2');
-    this._drawLevel(2, PERK_DEFINITIONS.filter(p => p.level === 2), 336);
+    this._drawLevelLabel(width / 2, 320, t('livello')(2));
+    this._drawLevel(2, PERK_DEFINITIONS.filter(p => p.level === 2), 336, t);
 
     drawDivider(this, width / 2, 516, width - 100, { color: C.borderSubtle, alpha: 0.3 });
-    this._drawLevelLabel(width / 2, 528, 'LIVELLO 3');
-    this._drawLevel(3, PERK_DEFINITIONS.filter(p => p.level === 3), 544);
+    this._drawLevelLabel(width / 2, 528, t('livello')(3));
+    this._drawLevel(3, PERK_DEFINITIONS.filter(p => p.level === 3), 544, t);
 
     // Nota footer
     drawDivider(this, width / 2, height - 38, width - 80, { color: C.borderSubtle, alpha: 0.3 });
-    this.add.text(width / 2, height - 20, 'Guadagni 1 punto abilità alla fine di ogni run (vittoria o sconfitta)', {
+    this.add.text(width / 2, height - 20, t('footerNote'), {
       fontFamily: FONT_BODY,
       fontSize: '10px',
       color: '#' + C.borderSubtle.toString(16).padStart(6, '0'),
@@ -104,10 +137,11 @@ export class PerkScene extends Phaser.Scene {
 
   _refreshPointsText() {
     const pts = PerkManager.getPoints();
-    this._pointsText.setText(`${pts} punto${pts !== 1 ? 'i' : ''} disponibile${pts !== 1 ? 'i' : ''}`);
+    const t = this._t;
+    this._pointsText.setText(t('puntiDisp')(pts));
   }
 
-  _drawLevel(level, defs, startY) {
+  _drawLevel(level, defs, startY, t) {
     const { width } = this.scale;
     const cardW = 240;
     const cardH = 150;
@@ -119,11 +153,11 @@ export class PerkScene extends Phaser.Scene {
     defs.forEach((def, i) => {
       const cx = startX + i * (cardW + gap);
       const cy = startY + cardH / 2;
-      this._drawPerkCard(cx, cy, cardW, cardH, def);
+      this._drawPerkCard(cx, cy, cardW, cardH, def, t);
     });
   }
 
-  _drawPerkCard(cx, cy, cw, ch, def) {
+  _drawPerkCard(cx, cy, cw, ch, def, t) {
     const unlocked  = PerkManager.hasUnlocked(def.id);
     const available = PerkManager.isAvailable(def.id);
     const canAfford = PerkManager.getPoints() >= def.cost;
@@ -160,7 +194,7 @@ export class PerkScene extends Phaser.Scene {
     this.add.text(cx, topY + 22, def.emoji, { fontSize: '24px' }).setOrigin(0.5);
 
     // Nome
-    this.add.text(cx, topY + 52, def.name.toUpperCase(), {
+    this.add.text(cx, topY + 52, LocaleManager.name(def).toUpperCase(), {
       fontFamily: FONT_UI,
       fontSize: '13px',
       color: nameColor,
@@ -169,7 +203,7 @@ export class PerkScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Descrizione
-    this.add.text(cx, topY + 70, def.description, {
+    this.add.text(cx, topY + 70, LocaleManager.desc(def), {
       fontFamily: FONT_BODY,
       fontSize: '10px',
       color: subColor,
@@ -180,7 +214,7 @@ export class PerkScene extends Phaser.Scene {
     // Stato / costo
     const botY = cy + ch / 2 - 18;
     if (unlocked) {
-      this.add.text(cx, botY, '✓ SBLOCCATO', {
+      this.add.text(cx, botY, t('sbloccato'), {
         fontFamily: FONT_UI, fontSize: '10px',
         color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
         fontStyle: '700', letterSpacing: 1,
@@ -189,7 +223,7 @@ export class PerkScene extends Phaser.Scene {
       const costColor = canAfford
         ? '#' + C.borderBright.toString(16).padStart(6, '0')
         : '#' + C.textSecondary.toString(16).padStart(6, '0');
-      this.add.text(cx, botY, `Costo: ${def.cost} punto${def.cost !== 1 ? 'i' : ''}`, {
+      this.add.text(cx, botY, t('costo')(def.cost), {
         fontFamily: FONT_UI, fontSize: '10px', color: costColor, fontStyle: '700',
       }).setOrigin(0.5);
 
@@ -202,7 +236,7 @@ export class PerkScene extends Phaser.Scene {
         hitArea.on('pointerup', () => this._tryUnlock(def.id));
       }
     } else {
-      this.add.text(cx, botY, '🔒 BLOCCATO', {
+      this.add.text(cx, botY, t('bloccato'), {
         fontFamily: FONT_UI, fontSize: '10px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
         fontStyle: '700',
@@ -213,16 +247,17 @@ export class PerkScene extends Phaser.Scene {
   _tryUnlock(id) {
     const def = PERK_DEFINITIONS.find(p => p.id === id);
     if (!def) return;
+    const t = this._t;
 
     const pts = PerkManager.getPoints();
     if (pts < def.cost) {
-      this._showFeedback('Punti insufficienti!', '#e85d5d');
+      this._showFeedback(t('puntiInsuff'), '#e85d5d');
       return;
     }
 
     const success = PerkManager.unlock(id);
     if (success) {
-      this._showFeedback(`${def.emoji} ${def.name} sbloccato!`, '#' + C.textGoldBright.toString(16).padStart(6, '0'));
+      this._showFeedback(t('sbloccatoMsg')(def.emoji, LocaleManager.name(def)), '#' + C.textGoldBright.toString(16).padStart(6, '0'));
       this.time.delayedCall(800, () => this.scene.restart());
     }
   }

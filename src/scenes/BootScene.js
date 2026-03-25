@@ -1,5 +1,15 @@
 import Phaser from 'phaser';
 import { SoundManager } from '../managers/SoundManager.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    caricamento: 'Caricamento...',
+  },
+  en: {
+    caricamento: 'Loading...',
+  },
+};
 
 /**
  * BootScene — Genera texture con stile moderno e carica asset audio.
@@ -11,7 +21,9 @@ export class BootScene extends Phaser.Scene {
 
   preload() {
     const { width, height } = this.scale;
-    this.add.text(width / 2, height / 2, 'Caricamento...', {
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
+    this.add.text(width / 2, height / 2, t('caricamento'), {
       fontFamily: 'Inter, sans-serif',
       fontSize: '22px',
       color: '#8c8c96'

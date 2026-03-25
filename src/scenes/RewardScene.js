@@ -5,6 +5,32 @@ import { CLASSES } from '../data/classes.js';
 import { SaveManager } from '../managers/SaveManager.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider, CARD_COLORS } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    title:          'RICOMPENSA',
+    chooseCard:     'Scegli una carta da aggiungere al mazzo:',
+    skipCard:       'SALTA CARTA',
+    deckInfo:       (n) => `Mazzo attuale: ${n} carte`,
+    goldReward:     (g) => `💰  +${g} oro`,
+    relicLabel:     (name) => `Reliquia: ${name}`,
+    comune:         'COMUNE',
+    nonComune:      'NON COMUNE',
+    rara:           'RARA',
+  },
+  en: {
+    title:          'REWARD',
+    chooseCard:     'Choose a card to add to your deck:',
+    skipCard:       'SKIP CARD',
+    deckInfo:       (n) => `Current deck: ${n} cards`,
+    goldReward:     (g) => `💰  +${g} gold`,
+    relicLabel:     (name) => `Relic: ${name}`,
+    comune:         'COMMON',
+    nonComune:      'UNCOMMON',
+    rara:           'RARE',
+  },
+};
 
 /**
  * RewardScene — Schermata ricompensa post-combattimento.
@@ -24,6 +50,10 @@ export class RewardScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.cameras.main.fadeIn(350, 0, 0, 0);
 
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
+    this._t = t;
+
     // Sfondo
     this.add.rectangle(width / 2, height / 2, width, height, C.bg);
 
@@ -39,7 +69,7 @@ export class RewardScene extends Phaser.Scene {
     this.add.rectangle(width / 2, 0, width, 3, C.borderGold).setOrigin(0.5, 0);
 
     // Titolo
-    this.add.text(width / 2, 26, 'RICOMPENSA', {
+    this.add.text(width / 2, 26, t('title'), {
       fontFamily: FONT_TITLE,
       fontSize: '36px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
@@ -58,7 +88,7 @@ export class RewardScene extends Phaser.Scene {
     }
 
     const cardAreaY = 110 + relicAreaHeight;
-    this.add.text(width / 2, cardAreaY, 'Scegli una carta da aggiungere al mazzo:', {
+    this.add.text(width / 2, cardAreaY, t('chooseCard'), {
       fontFamily: FONT_UI,
       fontSize: '14px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -69,7 +99,7 @@ export class RewardScene extends Phaser.Scene {
     this.createCardChoices(rewardCards, cardAreaY + 30);
 
     // Bottone "Salta" — in basso a destra
-    createButton(this, width - 120, height - 36, 180, 40, 'SALTA CARTA', {
+    createButton(this, width - 120, height - 36, 180, 40, t('skipCard'), {
       fill: C.bgPanelDark,
       hover: C.bgPanel,
       border: C.borderSubtle,
@@ -85,7 +115,7 @@ export class RewardScene extends Phaser.Scene {
 
     // Deck info
     const deckSize = this.runData.deckCards ? this.runData.deckCards.length : 10;
-    this.add.text(width / 2, height - 14, `Mazzo attuale: ${deckSize} carte`, {
+    this.add.text(width / 2, height - 14, t('deckInfo')(deckSize), {
       fontFamily: FONT_BODY,
       fontSize: '11px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -93,6 +123,7 @@ export class RewardScene extends Phaser.Scene {
   }
 
   _buildGoldPanel(width) {
+    const t = this._t;
     const goldHex = '#' + C.textGold.toString(16).padStart(6, '0');
     drawPanel(this, width / 2, 76, 220, 32, {
       radius: 8,
@@ -100,7 +131,7 @@ export class RewardScene extends Phaser.Scene {
       border: C.borderGoldDim,
       borderWidth: 1,
     });
-    this.add.text(width / 2, 76, `💰  +${this.goldReward} oro`, {
+    this.add.text(width / 2, 76, t('goldReward')(this.goldReward), {
       fontFamily: FONT_TITLE,
       fontSize: '15px',
       color: goldHex,
@@ -150,14 +181,14 @@ export class RewardScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Nome
-    this.add.text(width / 2 - boxW / 2 + 90, y - 14, `Reliquia: ${relic.name}`, {
+    this.add.text(width / 2 - boxW / 2 + 90, y - 14, this._t('relicLabel')(LocaleManager.name(relic)), {
       fontFamily: FONT_TITLE,
       fontSize: '14px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
     }).setOrigin(0, 0.5);
 
     // Descrizione
-    this.add.text(width / 2 - boxW / 2 + 90, y + 10, relic.description, {
+    this.add.text(width / 2 - boxW / 2 + 90, y + 10, LocaleManager.desc(relic), {
       fontFamily: FONT_BODY,
       fontSize: '11px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -172,7 +203,7 @@ export class RewardScene extends Phaser.Scene {
       if (unlockedRelic && unlockedRelic.length > 0) {
         const { width, height } = this.scale;
         unlockedRelic.forEach((ach, i) => {
-          const t = this.add.text(width / 2, height - 60 - i * 30, `🏆 ${ach.name}`, {
+          const t = this.add.text(width / 2, height - 60 - i * 30, `🏆 ${LocaleManager.name(ach)}`, {
             fontFamily: 'Rajdhani, sans-serif', fontSize: '14px', color: '#f0d880', fontStyle: '700'
           }).setOrigin(0.5).setDepth(200).setAlpha(0);
           this.tweens.add({ targets: t, alpha: 1, duration: 300, yoyo: true, hold: 2000,
@@ -199,11 +230,12 @@ export class RewardScene extends Phaser.Scene {
 
   createCardChoices(rewardCards, startY) {
     const { width } = this.scale;
+    const t = this._t;
 
     const rarityStyles = {
-      common:   { border: 0x8c8c96, label: 'COMUNE',      textColor: '#8c8c96' },
-      uncommon: { border: 0x5b9bd5, label: 'NON COMUNE',  textColor: '#7bb5e8' },
-      rare:     { border: 0xe8b84b, label: 'RARA',         textColor: '#e8b84b' },
+      common:   { border: 0x8c8c96, label: t('comune'),    textColor: '#8c8c96' },
+      uncommon: { border: 0x5b9bd5, label: t('nonComune'), textColor: '#7bb5e8' },
+      rare:     { border: 0xe8b84b, label: t('rara'),       textColor: '#e8b84b' },
     };
 
     const cardWidth  = 175;
@@ -265,7 +297,7 @@ export class RewardScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       // Nome carta
-      const nameText = this.add.text(0, -35, card.name, {
+      const nameText = this.add.text(0, -35, LocaleManager.name(card), {
         fontFamily: FONT_TITLE,
         fontSize: '13px',
         color: cardColors.text,
@@ -281,7 +313,7 @@ export class RewardScene extends Phaser.Scene {
       }).setOrigin(0.5);
 
       // Descrizione
-      const descText = this.add.text(0, 44, card.description, {
+      const descText = this.add.text(0, 44, LocaleManager.desc(card), {
         fontFamily: FONT_BODY,
         fontSize: '9px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -336,7 +368,7 @@ export class RewardScene extends Phaser.Scene {
     if (unlocked && unlocked.length > 0) {
       const { width, height } = this.scale;
       unlocked.forEach((ach, i) => {
-        const t = this.add.text(width / 2, height - 60 - i * 30, `🏆 ${ach.name}`, {
+        const t = this.add.text(width / 2, height - 60 - i * 30, `🏆 ${LocaleManager.name(ach)}`, {
           fontFamily: 'Rajdhani, sans-serif', fontSize: '14px', color: '#f0d880', fontStyle: '700'
         }).setOrigin(0.5).setDepth(200).setAlpha(0);
         this.tweens.add({ targets: t, alpha: 1, duration: 300, yoyo: true, hold: 2000,

@@ -3,6 +3,30 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { REWARD_CARDS } from '../data/cards.js';
 import { RELICS } from '../data/relics.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider, CARD_COLORS } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    title:       'GLOSSARIO',
+    tabCarte:    'CARTE',
+    tabReliquie: 'RELIQUIE',
+    indietro:    'INDIETRO',
+    scoperte:    (f, tot) => `${f} / ${tot} scoperte`,
+    comuni:      'COMUNI',
+    nonComuni:   'NON COMUNI',
+    rare:        'RARE',
+  },
+  en: {
+    title:       'GLOSSARY',
+    tabCarte:    'CARDS',
+    tabReliquie: 'RELICS',
+    indietro:    'BACK',
+    scoperte:    (f, tot) => `${f} / ${tot} discovered`,
+    comuni:      'COMMON',
+    nonComuni:   'UNCOMMON',
+    rare:        'RARE',
+  },
+};
 
 export class GlossaryScene extends Phaser.Scene {
   constructor() {
@@ -11,6 +35,9 @@ export class GlossaryScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+
+    const lang = LocaleManager.getLang();
+    this._t = k => (T[lang] || T.it)[k] ?? T.it[k];
 
     // Sfondo
     this.add.rectangle(width / 2, height / 2, width, height, C.bg);
@@ -27,7 +54,7 @@ export class GlossaryScene extends Phaser.Scene {
     this.add.rectangle(width / 2, 0, width, 3, C.borderGold).setOrigin(0.5, 0);
 
     // Titolo
-    this.add.text(width / 2, 24, 'GLOSSARIO', {
+    this.add.text(width / 2, 24, this._t('title'), {
       fontFamily: FONT_TITLE,
       fontSize: '32px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
@@ -61,7 +88,7 @@ export class GlossaryScene extends Phaser.Scene {
     footerLine.lineStyle(1, C.borderSubtle, 0.6);
     footerLine.lineBetween(0, height - barH, width, height - barH);
 
-    createButton(this, width / 2, height - barH / 2, 200, 40, 'INDIETRO', {
+    createButton(this, width / 2, height - barH / 2, 200, 40, this._t('indietro'), {
       fill: C.bgPanel,
       hover: C.btnHover,
       border: C.borderGold,
@@ -98,7 +125,7 @@ export class GlossaryScene extends Phaser.Scene {
       new Phaser.Geom.Rectangle(width / 2 - 115 - tabW / 2, tabY - tabH / 2, tabW, tabH),
       Phaser.Geom.Rectangle.Contains
     );
-    this.tabCardsText = this.add.text(width / 2 - 115, tabY, 'CARTE', {
+    this.tabCardsText = this.add.text(width / 2 - 115, tabY, this._t('tabCarte'), {
       fontFamily: FONT_UI,
       fontSize: '14px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
@@ -111,7 +138,7 @@ export class GlossaryScene extends Phaser.Scene {
       new Phaser.Geom.Rectangle(width / 2 + 115 - tabW / 2, tabY - tabH / 2, tabW, tabH),
       Phaser.Geom.Rectangle.Contains
     );
-    this.tabRelicsText = this.add.text(width / 2 + 115, tabY, 'RELIQUIE', {
+    this.tabRelicsText = this.add.text(width / 2 + 115, tabY, this._t('tabReliquie'), {
       fontFamily: FONT_UI,
       fontSize: '14px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -205,14 +232,14 @@ export class GlossaryScene extends Phaser.Scene {
     const total = allCards.length;
     const found  = allCards.filter(c => discovered.includes(c.name)).length;
     this.contentContainer.add(
-      this.add.text(width / 2, startY, `${found} / ${total} scoperte`, {
+      this.add.text(width / 2, startY, this._t('scoperte')(found, total), {
         fontFamily: FONT_UI,
         fontSize: '13px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       }).setOrigin(0.5)
     );
 
-    const rarityLabels = { common: 'COMUNI', uncommon: 'NON COMUNI', rare: 'RARE' };
+    const rarityLabels = { common: this._t('comuni'), uncommon: this._t('nonComuni'), rare: this._t('rare') };
     const rarityColors = {
       common:   '#' + C.textSecondary.toString(16).padStart(6, '0'),
       uncommon: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -306,7 +333,7 @@ export class GlossaryScene extends Phaser.Scene {
     );
 
     // Nome
-    const nameText = this.add.text(x + 44, y + 14, card.name, {
+    const nameText = this.add.text(x + 44, y + 14, LocaleManager.name(card), {
       fontFamily: FONT_TITLE,
       fontSize: '13px',
       color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
@@ -330,7 +357,7 @@ export class GlossaryScene extends Phaser.Scene {
 
     // Descrizione
     this.contentContainer.add(
-      this.add.text(x + 44, y + 34, card.description.replace(/\n/g, ' '), {
+      this.add.text(x + 44, y + 34, LocaleManager.desc(card).replace(/\n/g, ' '), {
         fontFamily: FONT_BODY,
         fontSize: '10px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -374,14 +401,14 @@ export class GlossaryScene extends Phaser.Scene {
     const total = allRelics.length;
     const found  = allRelics.filter(r => discovered.includes(r.id)).length;
     this.contentContainer.add(
-      this.add.text(width / 2, startY, `${found} / ${total} scoperte`, {
+      this.add.text(width / 2, startY, this._t('scoperte')(found, total), {
         fontFamily: FONT_UI,
         fontSize: '13px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       }).setOrigin(0.5)
     );
 
-    const rarityLabels = { common: 'COMUNI', uncommon: 'NON COMUNI', rare: 'RARE' };
+    const rarityLabels = { common: this._t('comuni'), uncommon: this._t('nonComuni'), rare: this._t('rare') };
     const rarityColors = {
       common:   '#' + C.textSecondary.toString(16).padStart(6, '0'),
       uncommon: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -457,7 +484,7 @@ export class GlossaryScene extends Phaser.Scene {
     );
 
     this.contentContainer.add(
-      this.add.text(x + 56, y + 16, relic.name, {
+      this.add.text(x + 56, y + 16, LocaleManager.name(relic), {
         fontFamily: FONT_TITLE,
         fontSize: '14px',
         color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
@@ -466,7 +493,7 @@ export class GlossaryScene extends Phaser.Scene {
     );
 
     this.contentContainer.add(
-      this.add.text(x + 56, y + 38, relic.description, {
+      this.add.text(x + 56, y + 38, LocaleManager.desc(relic), {
         fontFamily: FONT_BODY,
         fontSize: '11px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),

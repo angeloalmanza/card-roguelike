@@ -1,12 +1,38 @@
 import Phaser from 'phaser';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    header:           'MODALITÀ SFIDA',
+    subheader:        "Affronta la sfida del giorno per un'esperienza unica",
+    indietro:         'INDIETRO',
+    sfidaDelGiorno:   '— SFIDA DEL GIORNO —',
+    difficolta:       'Difficoltà',
+    accettaSfida:     '⚔️  ACCETTA SFIDA',
+    giocaNormale:     '🎮  GIOCA NORMALE',
+    notaFooter:       'La sfida del giorno cambia ogni giorno',
+  },
+  en: {
+    header:           'CHALLENGE MODE',
+    subheader:        'Take on the daily challenge for a unique experience',
+    indietro:         'BACK',
+    sfidaDelGiorno:   '— DAILY CHALLENGE —',
+    difficolta:       'Difficulty',
+    accettaSfida:     '⚔️  ACCEPT CHALLENGE',
+    giocaNormale:     '🎮  PLAY NORMAL',
+    notaFooter:       'The daily challenge changes every day',
+  },
+};
 
 const CHALLENGES = [
   {
     id: 'iron_man',
     name: 'Uomo di Ferro',
+    nameEn: 'Iron Man',
     emoji: '🛡️',
     description: 'Nessun nodo riposo disponibile sulla mappa.\nBonus: +50% oro da combattimenti.',
+    descriptionEn: 'No rest nodes available on the map.\nBonus: +50% gold from combats.',
     difficulty: '★★★',
     difficultyColor: '#e85d5d',
     flags: { noRest: true, goldBonus: 1.5 },
@@ -14,8 +40,10 @@ const CHALLENGES = [
   {
     id: 'glass_cannon',
     name: 'Cannone di Vetro',
+    nameEn: 'Glass Cannon',
     emoji: '💥',
     description: 'HP massimi dimezzati,\nma il danno è raddoppiato.',
+    descriptionEn: 'Max HP halved,\nbut damage is doubled.',
     difficulty: '★★★★',
     difficultyColor: '#e85d5d',
     flags: { halfHp: true, doubleDamage: true },
@@ -23,8 +51,10 @@ const CHALLENGES = [
   {
     id: 'cursed_run',
     name: 'Run Maledetta',
+    nameEn: 'Cursed Run',
     emoji: '💀',
     description: 'Inizi con 3 carte Maledizione nel mazzo.\nBonus: reliquie più rare.',
+    descriptionEn: 'Start with 3 Curse cards in your deck.\nBonus: rarer relics.',
     difficulty: '★★★',
     difficultyColor: '#b07be8',
     flags: { startCursed: true, betterRelics: true },
@@ -40,6 +70,8 @@ export class ChallengeScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this._transitioning = false;
     this.cameras.main.fadeIn(400, 0, 0, 0);
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
 
     // ── Sfondo ────────────────────────────────────────────────────────────────
     this.add.rectangle(width / 2, height / 2, width, height, C.bg);
@@ -58,21 +90,21 @@ export class ChallengeScene extends Phaser.Scene {
     this.add.rectangle(width / 2, 0, width, 2, C.attack).setOrigin(0.5, 0);
 
     // ── Header ────────────────────────────────────────────────────────────────
-    this.add.text(width / 2, 42, 'MODALITÀ SFIDA', {
+    this.add.text(width / 2, 42, t('header'), {
       fontFamily: FONT_TITLE,
       fontSize: '28px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
       letterSpacing: 5,
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 74, "Affronta la sfida del giorno per un'esperienza unica", {
+    this.add.text(width / 2, 74, t('subheader'), {
       fontFamily: FONT_UI,
       fontSize: '12px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
     }).setOrigin(0.5);
 
     // Bottone indietro
-    createButton(this, 90, 42, 140, 36, 'INDIETRO', {
+    createButton(this, 90, 42, 140, 36, t('indietro'), {
       fill: C.bgPanel,
       hover: C.btnHover,
       border: C.borderGold,
@@ -88,7 +120,7 @@ export class ChallengeScene extends Phaser.Scene {
     drawDivider(this, width / 2, 96, width - 80, { color: C.borderSubtle, alpha: 0.5 });
 
     // Etichetta sfida del giorno
-    this.add.text(width / 2, 116, '— SFIDA DEL GIORNO —', {
+    this.add.text(width / 2, 116, t('sfidaDelGiorno'), {
       fontFamily: FONT_UI,
       fontSize: '11px',
       color: '#' + C.hp.toString(16).padStart(6, '0'),
@@ -143,7 +175,7 @@ export class ChallengeScene extends Phaser.Scene {
       fontSize: '38px',
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, topY + 86, todayChallenge.name.toUpperCase(), {
+    this.add.text(width / 2, topY + 86, LocaleManager.name(todayChallenge).toUpperCase(), {
       fontFamily: FONT_TITLE,
       fontSize: '22px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
@@ -154,7 +186,7 @@ export class ChallengeScene extends Phaser.Scene {
       color: C.borderGold, alpha: 0.4,
     });
 
-    this.add.text(width / 2, topY + 120, todayChallenge.description, {
+    this.add.text(width / 2, topY + 120, LocaleManager.desc(todayChallenge), {
       fontFamily: FONT_BODY,
       fontSize: '12px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -162,7 +194,7 @@ export class ChallengeScene extends Phaser.Scene {
       wordWrap: { width: cardW - 60 },
     }).setOrigin(0.5, 0);
 
-    this.add.text(width / 2, topY + cardH - 26, `Difficoltà: ${todayChallenge.difficulty}`, {
+    this.add.text(width / 2, topY + cardH - 26, `${t('difficolta')}: ${todayChallenge.difficulty}`, {
       fontFamily: FONT_UI,
       fontSize: '13px',
       color: todayChallenge.difficultyColor,
@@ -172,7 +204,7 @@ export class ChallengeScene extends Phaser.Scene {
     // ── Bottoni ───────────────────────────────────────────────────────────────
     const btnY = height / 2 + cardH / 2 + 44;
 
-    createButton(this, width / 2 - 155, btnY, 240, 50, '⚔️  ACCETTA SFIDA', {
+    createButton(this, width / 2 - 155, btnY, 240, 50, t('accettaSfida'), {
       fill: C.btnDanger,
       hover: C.btnDangerHov,
       border: C.attack,
@@ -182,7 +214,7 @@ export class ChallengeScene extends Phaser.Scene {
       onClick: () => this._go('ClassSelection', { challengeData: todayChallenge }),
     });
 
-    createButton(this, width / 2 + 155, btnY, 240, 50, '🎮  GIOCA NORMALE', {
+    createButton(this, width / 2 + 155, btnY, 240, 50, t('giocaNormale'), {
       fill: C.btnPrimary,
       hover: C.btnHover,
       border: C.borderSubtle,
@@ -193,7 +225,7 @@ export class ChallengeScene extends Phaser.Scene {
     });
 
     // Nota
-    this.add.text(width / 2, height - 18, 'La sfida del giorno cambia ogni giorno', {
+    this.add.text(width / 2, height - 18, t('notaFooter'), {
       fontFamily: FONT_BODY,
       fontSize: '10px',
       color: '#' + C.borderSubtle.toString(16).padStart(6, '0'),

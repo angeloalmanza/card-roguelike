@@ -7,6 +7,54 @@ import { MapGenerator } from '../managers/MapGenerator.js';
 import { PerkManager } from '../managers/PerkManager.js';
 import { AscensionManager } from '../managers/AscensionManager.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    header:            'SCEGLI LA TUA CLASSE',
+    subheader:         'Ogni classe offre uno stile di gioco diverso',
+    runNormale:        'Run Normale',
+    indietro:          '← INDIETRO',
+    mazzoIniziale:     'MAZZO INIZIALE',
+    seleziona:         'SELEZIONA',
+    vinciRun:          'Vinci una run per sbloccare nuove classi',
+    vittorieTotali:    'Vittorie totali',
+    vinciN:            (n) => `Vinci ${n} volt${n === 1 ? 'a' : 'e'}`,
+    ascensione:        (lvl, desc) => `⚡ ASCENSIONE ${lvl}   ${desc}`,
+    asc10:             'Boss con HP extra, 2 maledizioni, nessuna cura',
+    asc9:              '2 Maledizioni iniziali, nessuna cura tra combattimenti',
+    asc8:              '+6 danno nemici, nessuna cura tra combattimenti',
+    asc7:              '+30% HP nemici, nessuna cura tra combattimenti',
+    asc6:              'Nessun recupero HP tra combattimenti',
+    asc5:              'Elite dal piano 3, shop più caro',
+    asc4:              'Shop +25%, 1 Maledizione iniziale',
+    asc3:              '1 Maledizione iniziale, nemici +2 danno',
+    asc2:              'Nemici +10% HP, +2 danno',
+    asc1:              'Nemici +10% HP',
+  },
+  en: {
+    header:            'SELECT YOUR CLASS',
+    subheader:         'Each class offers a different playstyle',
+    runNormale:        'Normal Run',
+    indietro:          '← BACK',
+    mazzoIniziale:     'STARTER DECK',
+    seleziona:         'SELECT',
+    vinciRun:          'Win a run to unlock new classes',
+    vittorieTotali:    'Total victories',
+    vinciN:            (n) => `Win ${n} more time${n === 1 ? '' : 's'}`,
+    ascensione:        (lvl, desc) => `⚡ ASCENSION ${lvl}   ${desc}`,
+    asc10:             'Boss with extra HP, 2 curses, no healing',
+    asc9:              '2 starting curses, no healing between combats',
+    asc8:              '+6 enemy damage, no healing between combats',
+    asc7:              '+30% enemy HP, no healing between combats',
+    asc6:              'No HP recovery between combats',
+    asc5:              'Elites from floor 3, shop costs more',
+    asc4:              'Shop +25%, 1 starting curse',
+    asc3:              '1 starting curse, enemies +2 damage',
+    asc2:              'Enemies +10% HP, +2 damage',
+    asc1:              'Enemies +10% HP',
+  },
+};
 
 // Colori banda superiore per classe
 const CLASS_BAND_COLORS = {
@@ -28,6 +76,8 @@ export class ClassSelectionScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this._transitioning = false;
     this.cameras.main.fadeIn(400, 0, 0, 0);
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
 
     const victories = SaveManager.getStats().victories || 0;
 
@@ -48,14 +98,14 @@ export class ClassSelectionScene extends Phaser.Scene {
     this.add.rectangle(width / 2, 0, width, 2, C.borderGold).setOrigin(0.5, 0);
 
     // ── Header ────────────────────────────────────────────────────────────────
-    this.add.text(width / 2, 42, 'SCEGLI LA TUA CLASSE', {
+    this.add.text(width / 2, 42, t('header'), {
       fontFamily: FONT_TITLE,
       fontSize: '28px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
       letterSpacing: 5,
     }).setOrigin(0.5);
 
-    this.add.text(width / 2, 76, 'Ogni classe offre uno stile di gioco diverso', {
+    this.add.text(width / 2, 76, t('subheader'), {
       fontFamily: FONT_UI,
       fontSize: '13px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -64,31 +114,31 @@ export class ClassSelectionScene extends Phaser.Scene {
     // Ascensione
     const ascLevel = AscensionManager.getLevel();
     if (ascLevel === 0) {
-      this.add.text(width / 2, 100, 'Run Normale', {
+      this.add.text(width / 2, 100, t('runNormale'), {
         fontFamily: FONT_UI, fontSize: '12px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
         fontStyle: '700',
       }).setOrigin(0.5);
     } else {
       let modDesc = '';
-      if (ascLevel >= 10) modDesc = 'Boss con HP extra, 2 maledizioni, nessuna cura';
-      else if (ascLevel >= 9) modDesc = '2 Maledizioni iniziali, nessuna cura tra combattimenti';
-      else if (ascLevel >= 8) modDesc = '+6 danno nemici, nessuna cura tra combattimenti';
-      else if (ascLevel >= 7) modDesc = '+30% HP nemici, nessuna cura tra combattimenti';
-      else if (ascLevel >= 6) modDesc = 'Nessun recupero HP tra combattimenti';
-      else if (ascLevel >= 5) modDesc = 'Elite dal piano 3, shop più caro';
-      else if (ascLevel >= 4) modDesc = 'Shop +25%, 1 Maledizione iniziale';
-      else if (ascLevel >= 3) modDesc = '1 Maledizione iniziale, nemici +2 danno';
-      else if (ascLevel >= 2) modDesc = 'Nemici +10% HP, +2 danno';
-      else modDesc = 'Nemici +10% HP';
+      if (ascLevel >= 10) modDesc = t('asc10');
+      else if (ascLevel >= 9) modDesc = t('asc9');
+      else if (ascLevel >= 8) modDesc = t('asc8');
+      else if (ascLevel >= 7) modDesc = t('asc7');
+      else if (ascLevel >= 6) modDesc = t('asc6');
+      else if (ascLevel >= 5) modDesc = t('asc5');
+      else if (ascLevel >= 4) modDesc = t('asc4');
+      else if (ascLevel >= 3) modDesc = t('asc3');
+      else if (ascLevel >= 2) modDesc = t('asc2');
+      else modDesc = t('asc1');
 
-      this.add.text(width / 2, 100, `⚡ ASCENSIONE ${ascLevel}   ${modDesc}`, {
+      this.add.text(width / 2, 100, t('ascensione')(ascLevel, modDesc), {
         fontFamily: FONT_UI, fontSize: '12px', color: '#e8681a', fontStyle: '700',
       }).setOrigin(0.5);
     }
 
     // Bottone indietro
-    const backBtn = this.add.text(30, 42, '← INDIETRO', {
+    const backBtn = this.add.text(30, 42, t('indietro'), {
       fontFamily: FONT_UI, fontSize: '12px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'), fontStyle: '700',
     }).setOrigin(0, 0.5).setInteractive({ useHandCursor: true });
@@ -109,25 +159,25 @@ export class ClassSelectionScene extends Phaser.Scene {
     CLASSES.forEach((cls, i) => {
       const cx = startX + i * (cardW + gap);
       const unlocked = victories >= cls.unlockRequirement;
-      this._drawClassCard(cx, cardY, cardW, cardH, cls, unlocked, victories, ascLevel);
+      this._drawClassCard(cx, cardY, cardW, cardH, cls, unlocked, victories, ascLevel, t);
     });
 
     // Footer
     drawDivider(this, width / 2, height - 42, width - 80, { color: C.borderSubtle, alpha: 0.4 });
     if (victories === 0) {
-      this.add.text(width / 2, height - 24, 'Vinci una run per sbloccare nuove classi', {
+      this.add.text(width / 2, height - 24, t('vinciRun'), {
         fontFamily: FONT_BODY, fontSize: '11px',
         color: '#' + C.borderSubtle.toString(16).padStart(6, '0'),
       }).setOrigin(0.5);
     } else {
-      this.add.text(width / 2, height - 24, `Vittorie totali: ${victories}`, {
+      this.add.text(width / 2, height - 24, `${t('vittorieTotali')}: ${victories}`, {
         fontFamily: FONT_BODY, fontSize: '11px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       }).setOrigin(0.5);
     }
   }
 
-  _drawClassCard(cx, cy, cw, ch, cls, unlocked, victories, ascLevel) {
+  _drawClassCard(cx, cy, cw, ch, cls, unlocked, victories, ascLevel, t) {
     const bandH = 46;
     const bandColor = CLASS_BAND_COLORS[cls.id] || 0x1a1a2a;
     const topY = cy - ch / 2;
@@ -161,7 +211,7 @@ export class ClassSelectionScene extends Phaser.Scene {
     }
 
     // Nome classe
-    this.add.text(cx, topY + bandH + 18, cls.name.toUpperCase(), {
+    this.add.text(cx, topY + bandH + 18, LocaleManager.name(cls).toUpperCase(), {
       fontFamily: FONT_TITLE,
       fontSize: '16px',
       color: unlocked ? '#' + C.textGoldBright.toString(16).padStart(6, '0') : '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -190,7 +240,7 @@ export class ClassSelectionScene extends Phaser.Scene {
     // Reliquia
     const relic = RELICS[cls.starterRelicId];
     if (relic) {
-      this.add.text(cx, topY + bandH + 70, `${relic.emoji} ${relic.name}`, {
+      this.add.text(cx, topY + bandH + 70, `${relic.emoji} ${LocaleManager.name(relic)}`, {
         fontFamily: FONT_UI, fontSize: '11px',
         color: unlocked ? '#' + C.textGold.toString(16).padStart(6, '0') : '#' + C.borderSubtle.toString(16).padStart(6, '0'),
         fontStyle: '700',
@@ -204,7 +254,7 @@ export class ClassSelectionScene extends Phaser.Scene {
     });
 
     // Mazzo label
-    this.add.text(cx, topY + bandH + 100, 'MAZZO INIZIALE', {
+    this.add.text(cx, topY + bandH + 100, t('mazzoIniziale'), {
       fontFamily: FONT_UI, fontSize: '9px',
       color: unlocked ? '#' + C.textSecondary.toString(16).padStart(6, '0') : '#333',
       letterSpacing: 2,
@@ -230,7 +280,7 @@ export class ClassSelectionScene extends Phaser.Scene {
 
       this.add.text(cx, cy - 14, '🔒', { fontSize: '26px' }).setOrigin(0.5);
       const needed = cls.unlockRequirement - victories;
-      this.add.text(cx, cy + 18, `Vinci ${needed} volt${needed === 1 ? 'a' : 'e'}`, {
+      this.add.text(cx, cy + 18, t('vinciN')(needed), {
         fontFamily: FONT_UI, fontSize: '12px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'), fontStyle: '700',
       }).setOrigin(0.5);
@@ -240,7 +290,7 @@ export class ClassSelectionScene extends Phaser.Scene {
         color: C.borderGold, alpha: 0.4,
       });
 
-      this.add.text(cx, cy + ch / 2 - 18, 'SELEZIONA', {
+      this.add.text(cx, cy + ch / 2 - 18, t('seleziona'), {
         fontFamily: FONT_TITLE, fontSize: '11px',
         color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
         letterSpacing: 3,
@@ -270,7 +320,8 @@ export class ClassSelectionScene extends Phaser.Scene {
   _summarizeDeck(deck) {
     const counts = {};
     deck.forEach(c => {
-      counts[c.name] = (counts[c.name] || 0) + 1;
+      const displayName = LocaleManager.name(c);
+      counts[displayName] = (counts[displayName] || 0) + 1;
     });
     return Object.entries(counts).map(([name, n]) => n > 1 ? `${name} ×${n}` : name);
   }

@@ -2,6 +2,54 @@ import Phaser from 'phaser';
 import { SaveManager } from '../managers/SaveManager.js';
 import { CLASSES, CLASS_EMOJIS } from '../data/classes.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider, CARD_COLORS } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    victory:            '🏆 VITTORIA!',
+    defeat:             '💀 SCONFITTA',
+    runCompleted:       (floor) => `Run completata — Piano ${floor}`,
+    stats:              'STATISTICHE',
+    finalDeck:          'MAZZO FINALE',
+    classe:             'Classe',
+    hpFinale:           'HP finale',
+    pianoRaggiunto:     'Piano raggiunto',
+    reliquieRaccolte:   'Reliquie raccolte',
+    carteNelMazzo:      'Carte nel mazzo',
+    dannoInflitto:      'Danno inflitto',
+    dannoSubito:        'Danno subito',
+    carteGiocate:       'Carte giocate',
+    nemiciUccisi:       'Nemici uccisi',
+    turniGiocati:       'Turni giocati',
+    moreCards:          (n) => `+ altre ${n} carte...`,
+    mazzoVuoto:         'Mazzo vuoto',
+    achievementsLabel:  '🏆 Achievement sbloccati:',
+    menuBtn:            'MENU PRINCIPALE',
+    newGameBtn:         'NUOVA PARTITA',
+  },
+  en: {
+    victory:            '🏆 VICTORY!',
+    defeat:             '💀 DEFEAT',
+    runCompleted:       (floor) => `Run completed — Floor ${floor}`,
+    stats:              'STATISTICS',
+    finalDeck:          'FINAL DECK',
+    classe:             'Class',
+    hpFinale:           'Final HP',
+    pianoRaggiunto:     'Floor reached',
+    reliquieRaccolte:   'Relics collected',
+    carteNelMazzo:      'Cards in deck',
+    dannoInflitto:      'Damage dealt',
+    dannoSubito:        'Damage taken',
+    carteGiocate:       'Cards played',
+    nemiciUccisi:       'Enemies defeated',
+    turniGiocati:       'Turns played',
+    moreCards:          (n) => `+ ${n} more cards...`,
+    mazzoVuoto:         'Empty deck',
+    achievementsLabel:  '🏆 Achievements unlocked:',
+    menuBtn:            'MAIN MENU',
+    newGameBtn:         'NEW GAME',
+  },
+};
 
 const TYPE_COLORS = {
   attack: '#e85d5d',
@@ -33,6 +81,9 @@ export class EndRunScene extends Phaser.Scene {
     const W = this.scale.width;   // 1280
     const H = this.scale.height;  // 720
 
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
+
     const isVictory = this.result === 'victory';
 
     // Sfondo
@@ -55,7 +106,7 @@ export class EndRunScene extends Phaser.Scene {
     bannerG.setAlpha(0);
 
     const resultText = this.add.text(W / 2, 52,
-      isVictory ? '🏆 VITTORIA!' : '💀 SCONFITTA',
+      isVictory ? t('victory') : t('defeat'),
       {
         fontFamily: FONT_TITLE,
         fontSize: '52px',
@@ -66,7 +117,7 @@ export class EndRunScene extends Phaser.Scene {
 
     const floorNum = (this.runData.currentFloor != null ? this.runData.currentFloor : -1) + 1;
     const subText = this.add.text(W / 2, 100,
-      `Run completata — Piano ${floorNum}`,
+      t('runCompleted')(floorNum),
       {
         fontFamily: FONT_UI,
         fontSize: '14px',
@@ -93,7 +144,7 @@ export class EndRunScene extends Phaser.Scene {
     });
     leftPanelG.setAlpha(0);
 
-    const statsTitle = this.add.text(LX, statsStartY, 'STATISTICHE', {
+    const statsTitle = this.add.text(LX, statsStartY, t('stats'), {
       fontFamily: FONT_TITLE,
       fontSize: '13px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -110,17 +161,17 @@ export class EndRunScene extends Phaser.Scene {
     const deckCount   = (this.runData.deckCards || []).length;
 
     const statRows = [
-      { label: 'Classe',           value: `${classEmoji} ${classData.name}` },
-      { label: 'HP finale',        value: `${this.runData.playerHp || 0} / ${this.runData.maxHp || classData.maxHp}` },
-      { label: 'Piano raggiunto',  value: `${floorNum}` },
-      { label: 'Reliquie raccolte',value: `${relicsCount}` },
-      { label: 'Carte nel mazzo',  value: `${deckCount}` },
+      { label: t('classe'),           value: `${classEmoji} ${LocaleManager.name(classData)}` },
+      { label: t('hpFinale'),         value: `${this.runData.playerHp || 0} / ${this.runData.maxHp || classData.maxHp}` },
+      { label: t('pianoRaggiunto'),   value: `${floorNum}` },
+      { label: t('reliquieRaccolte'), value: `${relicsCount}` },
+      { label: t('carteNelMazzo'),    value: `${deckCount}` },
       null, // separatore
-      { label: 'Danno inflitto',   value: `${this.stats.damageDealt}` },
-      { label: 'Danno subito',     value: `${this.stats.damageTaken}` },
-      { label: 'Carte giocate',    value: `${this.stats.cardsPlayed}` },
-      { label: 'Nemici uccisi',    value: `${this.stats.enemiesKilled}` },
-      { label: 'Turni giocati',    value: `${this.stats.turnsPlayed}` },
+      { label: t('dannoInflitto'),    value: `${this.stats.damageDealt}` },
+      { label: t('dannoSubito'),      value: `${this.stats.damageTaken}` },
+      { label: t('carteGiocate'),     value: `${this.stats.cardsPlayed}` },
+      { label: t('nemiciUccisi'),     value: `${this.stats.enemiesKilled}` },
+      { label: t('turniGiocati'),     value: `${this.stats.turnsPlayed}` },
     ];
 
     let rowY = statsStartY + 26;
@@ -174,7 +225,7 @@ export class EndRunScene extends Phaser.Scene {
     });
     rightPanelG.setAlpha(0);
 
-    const deckTitle = this.add.text(RX, statsStartY, 'MAZZO FINALE', {
+    const deckTitle = this.add.text(RX, statsStartY, t('finalDeck'), {
       fontFamily: FONT_TITLE,
       fontSize: '13px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -211,7 +262,7 @@ export class EndRunScene extends Phaser.Scene {
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       }).setOrigin(0, 0.5);
 
-      const nameTxt = this.add.text(RX + 28, cardRowY, card.name || '?', {
+      const nameTxt = this.add.text(RX + 28, cardRowY, LocaleManager.name(card) || '?', {
         fontFamily: FONT_UI,
         fontSize: '13px',
         color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
@@ -228,7 +279,7 @@ export class EndRunScene extends Phaser.Scene {
     });
 
     if (deckCards.length > 10) {
-      const moreTxt = this.add.text(RX, cardRowY, `+ altre ${deckCards.length - 10} carte...`, {
+      const moreTxt = this.add.text(RX, cardRowY, t('moreCards')(deckCards.length - 10), {
         fontFamily: FONT_BODY,
         fontSize: '12px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -237,7 +288,7 @@ export class EndRunScene extends Phaser.Scene {
     }
 
     if (deckCards.length === 0) {
-      const emptyTxt = this.add.text(RX, statsStartY + 28, 'Mazzo vuoto', {
+      const emptyTxt = this.add.text(RX, statsStartY + 28, t('mazzoVuoto'), {
         fontFamily: FONT_BODY,
         fontSize: '13px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -255,7 +306,7 @@ export class EndRunScene extends Phaser.Scene {
       const achY = 530;
       drawDivider(this, W / 2, achY - 8, W - 100, { color: C.borderSubtle, alpha: 0.5 });
 
-      const achLabel = this.add.text(60, achY + 8, '🏆 Achievement sbloccati:', {
+      const achLabel = this.add.text(60, achY + 8, t('achievementsLabel'), {
         fontFamily: FONT_UI,
         fontSize: '13px',
         color: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -267,7 +318,7 @@ export class EndRunScene extends Phaser.Scene {
       let pillX = 220;
       const pillY = achY + 8;
       achievements.forEach((a) => {
-        const achName = a.name || a;
+        const achName = LocaleManager.name(a) || a.name || a;
         const pillW   = Math.max(achName.length * 8 + 24, 80);
 
         const pillG = this.add.graphics();
@@ -298,7 +349,7 @@ export class EndRunScene extends Phaser.Scene {
 
     const menuBtnX = isVictory ? W / 2 - 145 : W / 2;
     const { bg: menuBg, txt: menuTxt } = createButton(
-      this, menuBtnX, footerY, 240, 52, 'MENU PRINCIPALE', {
+      this, menuBtnX, footerY, 240, 52, t('menuBtn'), {
         fill: C.bgPanel,
         hover: C.btnHover,
         border: C.borderGold,
@@ -322,7 +373,7 @@ export class EndRunScene extends Phaser.Scene {
 
     if (isVictory) {
       const { bg: newBg, txt: newTxt } = createButton(
-        this, W / 2 + 145, footerY, 240, 52, 'NUOVA PARTITA', {
+        this, W / 2 + 145, footerY, 240, 52, t('newGameBtn'), {
           fill: C.btnSuccess,
           hover: C.btnSuccessHov,
           border: C.poison,

@@ -1,7 +1,65 @@
 import Phaser from 'phaser';
 import { SaveManager } from '../managers/SaveManager.js';
-import { CLASS_EMOJIS } from '../data/classes.js';
+import { CLASS_EMOJIS, CLASSES } from '../data/classes.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    title:            'STATISTICHE',
+    tabGlobali:       'GLOBALI',
+    tabClassifica:    '🏆 CLASSIFICA',
+    runTotali:        'Run totali',
+    vittorie:         'Vittorie',
+    sconfitte:        'Sconfitte',
+    tassoVittoria:    'Tasso vittoria',
+    pianoMassimo:     'Piano massimo',
+    nemiciSconfitti:  'Nemici sconfitti',
+    oroGuadagnato:    'Oro guadagnato',
+    carteScope:       'Carte scoperte',
+    reliquieScope:    'Reliquie scoperte',
+    ultimeRun:        'ULTIME RUN',
+    nessunRun:        'Nessuna run completata',
+    nessunRunLb:      'Nessuna run completata ancora',
+    pianoEntry:       (n) => `Piano ${n}`,
+    carteEntry:       (n) => `${n} carte`,
+    indietro:         'INDIETRO',
+    colPos:           'POS',
+    colClasse:        'CLASSE',
+    colPiano:         'PIANO',
+    colOro:           'ORO',
+    colMazzo:         'MAZZO',
+    colAsc:           'ASC',
+    colData:          'DATA',
+  },
+  en: {
+    title:            'STATISTICS',
+    tabGlobali:       'GLOBAL',
+    tabClassifica:    '🏆 LEADERBOARD',
+    runTotali:        'Total runs',
+    vittorie:         'Victories',
+    sconfitte:        'Defeats',
+    tassoVittoria:    'Win rate',
+    pianoMassimo:     'Highest floor',
+    nemiciSconfitti:  'Enemies defeated',
+    oroGuadagnato:    'Gold earned',
+    carteScope:       'Cards discovered',
+    reliquieScope:    'Relics discovered',
+    ultimeRun:        'RECENT RUNS',
+    nessunRun:        'No completed runs',
+    nessunRunLb:      'No completed runs yet',
+    pianoEntry:       (n) => `Floor ${n}`,
+    carteEntry:       (n) => `${n} cards`,
+    indietro:         'BACK',
+    colPos:           'POS',
+    colClasse:        'CLASS',
+    colPiano:         'FLOOR',
+    colOro:           'GOLD',
+    colMazzo:         'DECK',
+    colAsc:           'ASC',
+    colData:          'DATE',
+  },
+};
 
 export class StatsScene extends Phaser.Scene {
   constructor() {
@@ -10,6 +68,9 @@ export class StatsScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+
+    const lang = LocaleManager.getLang();
+    this._t = k => (T[lang] || T.it)[k] ?? T.it[k];
 
     this._buildBackground(width, height);
 
@@ -43,7 +104,7 @@ export class StatsScene extends Phaser.Scene {
     this.add.rectangle(width / 2, 0, width, 3, C.borderGold).setOrigin(0.5, 0);
 
     // Titolo
-    this.add.text(width / 2, 28, 'STATISTICHE', {
+    this.add.text(width / 2, 28, this._t('title'), {
       fontFamily: FONT_TITLE,
       fontSize: '32px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
@@ -60,8 +121,8 @@ export class StatsScene extends Phaser.Scene {
   _buildTabs(width) {
     const tabY = 88;
     const tabs = [
-      { id: 'stats',       label: 'GLOBALI' },
-      { id: 'leaderboard', label: '🏆 CLASSIFICA' },
+      { id: 'stats',       label: this._t('tabGlobali') },
+      { id: 'leaderboard', label: this._t('tabClassifica') },
     ];
 
     this._tabObjs = {};
@@ -151,16 +212,17 @@ export class StatsScene extends Phaser.Scene {
     const stats = SaveManager.getStats();
     const collection = SaveManager.getCollection();
 
+    const t = this._t;
     const entries = [
-      { icon: '⚔️',  label: 'Run totali',        value: stats.totalRuns },
-      { icon: '🏆',  label: 'Vittorie',            value: stats.victories },
-      { icon: '💀',  label: 'Sconfitte',           value: stats.defeats },
-      { icon: '📊',  label: 'Tasso vittoria',      value: stats.totalRuns > 0 ? Math.round((stats.victories / stats.totalRuns) * 100) + '%' : '-' },
-      { icon: '🗺️',  label: 'Piano massimo',       value: stats.highestFloor + 1 },
-      { icon: '💀',  label: 'Nemici sconfitti',    value: stats.enemiesKilled },
-      { icon: '💰',  label: 'Oro guadagnato',      value: stats.goldEarned },
-      { icon: '🃏',  label: 'Carte scoperte',      value: `${collection.cards.length}` },
-      { icon: '🔮',  label: 'Reliquie scoperte',   value: `${collection.relics.length}` },
+      { icon: '⚔️',  label: t('runTotali'),        value: stats.totalRuns },
+      { icon: '🏆',  label: t('vittorie'),          value: stats.victories },
+      { icon: '💀',  label: t('sconfitte'),         value: stats.defeats },
+      { icon: '📊',  label: t('tassoVittoria'),     value: stats.totalRuns > 0 ? Math.round((stats.victories / stats.totalRuns) * 100) + '%' : '-' },
+      { icon: '🗺️',  label: t('pianoMassimo'),      value: stats.highestFloor + 1 },
+      { icon: '💀',  label: t('nemiciSconfitti'),   value: stats.enemiesKilled },
+      { icon: '💰',  label: t('oroGuadagnato'),     value: stats.goldEarned },
+      { icon: '🃏',  label: t('carteScope'),        value: `${collection.cards.length}` },
+      { icon: '🔮',  label: t('reliquieScope'),     value: `${collection.relics.length}` },
     ];
 
     const startY = 115;
@@ -206,7 +268,7 @@ export class StatsScene extends Phaser.Scene {
     const historyBaseY = startY + entries.length * rowH + 36;
 
     drawDivider(this, width / 2, historyBaseY - 12, panelW, { color: C.borderGold, alpha: 0.3 });
-    container.add(this.add.text(width / 2, historyBaseY + 4, 'ULTIME RUN', {
+    container.add(this.add.text(width / 2, historyBaseY + 4, t('ultimeRun'), {
       fontFamily: FONT_TITLE,
       fontSize: '13px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -218,7 +280,7 @@ export class StatsScene extends Phaser.Scene {
     const histStartY  = historyBaseY + 26;
 
     if (history.length === 0) {
-      container.add(this.add.text(width / 2, histStartY + 16, 'Nessuna run completata', {
+      container.add(this.add.text(width / 2, histStartY + 16, t('nessunRun'), {
         fontFamily: FONT_BODY,
         fontSize: '13px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -257,7 +319,7 @@ export class StatsScene extends Phaser.Scene {
           fontFamily: FONT_UI, fontSize: '16px', color: resultColor, fontStyle: '700',
         }).setOrigin(0, 0.5));
 
-        container.add(this.add.text(leftX + 68, y, `Piano ${run.floorsVisited}`, {
+        container.add(this.add.text(leftX + 68, y, t('pianoEntry')(run.floorsVisited), {
           fontFamily: FONT_UI, fontSize: '13px',
           color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
         }).setOrigin(0, 0.5));
@@ -267,7 +329,7 @@ export class StatsScene extends Phaser.Scene {
           color: '#' + C.textGold.toString(16).padStart(6, '0'),
         }).setOrigin(0, 0.5));
 
-        container.add(this.add.text(rightX, y, `${run.deckSize} carte`, {
+        container.add(this.add.text(rightX, y, t('carteEntry')(run.deckSize), {
           fontFamily: FONT_UI, fontSize: '13px',
           color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
         }).setOrigin(1, 0.5));
@@ -281,12 +343,13 @@ export class StatsScene extends Phaser.Scene {
   _showLeaderboard(width, height) {
     const container = this.add.container(0, 0);
     this._contentContainer = container;
+    const t = this._t;
 
     const leaderboard = SaveManager.getLeaderboard();
     const startY = 118;
 
     if (leaderboard.length === 0) {
-      container.add(this.add.text(width / 2, height / 2, 'Nessuna run completata ancora', {
+      container.add(this.add.text(width / 2, height / 2, t('nessunRunLb'), {
         fontFamily: FONT_UI,
         fontSize: '16px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -308,13 +371,13 @@ export class StatsScene extends Phaser.Scene {
 
     const goldBright = '#' + C.textGoldBright.toString(16).padStart(6, '0');
     const headerStyle = { fontFamily: FONT_UI, fontSize: '11px', color: goldBright, fontStyle: '700', letterSpacing: 1 };
-    container.add(this.add.text(cols.pos,    headerY, 'POS',    headerStyle).setOrigin(0.5, 0.5));
-    container.add(this.add.text(cols.classe, headerY, 'CLASSE', headerStyle).setOrigin(0, 0.5));
-    container.add(this.add.text(cols.piano,  headerY, 'PIANO',  headerStyle).setOrigin(0.5, 0.5));
-    container.add(this.add.text(cols.oro,    headerY, 'ORO',    headerStyle).setOrigin(0.5, 0.5));
-    container.add(this.add.text(cols.mazzo,  headerY, 'MAZZO',  headerStyle).setOrigin(0.5, 0.5));
-    container.add(this.add.text(cols.asc,    headerY, 'ASC',    headerStyle).setOrigin(0.5, 0.5));
-    container.add(this.add.text(cols.data,   headerY, 'DATA',   headerStyle).setOrigin(1, 0.5));
+    container.add(this.add.text(cols.pos,    headerY, t('colPos'),    headerStyle).setOrigin(0.5, 0.5));
+    container.add(this.add.text(cols.classe, headerY, t('colClasse'), headerStyle).setOrigin(0, 0.5));
+    container.add(this.add.text(cols.piano,  headerY, t('colPiano'),  headerStyle).setOrigin(0.5, 0.5));
+    container.add(this.add.text(cols.oro,    headerY, t('colOro'),    headerStyle).setOrigin(0.5, 0.5));
+    container.add(this.add.text(cols.mazzo,  headerY, t('colMazzo'),  headerStyle).setOrigin(0.5, 0.5));
+    container.add(this.add.text(cols.asc,    headerY, t('colAsc'),    headerStyle).setOrigin(0.5, 0.5));
+    container.add(this.add.text(cols.data,   headerY, t('colData'),   headerStyle).setOrigin(1, 0.5));
 
     drawDivider(this, width / 2, headerY + 14, width - 100, { color: C.borderSubtle, alpha: 0.8 });
 
@@ -351,7 +414,9 @@ export class StatsScene extends Phaser.Scene {
         ? '#' + C.poison.toString(16).padStart(6, '0')
         : '#' + C.hp.toString(16).padStart(6, '0');
       const resultMark  = entry.result === 'victory' ? '✓' : '✗';
-      container.add(this.add.text(cols.classe, y, `${classEmoji} ${entry.classId || '?'}`, {
+      const _classData = CLASSES.find(c => c.id === entry.classId);
+      const _className = _classData ? LocaleManager.name(_classData) : (entry.classId || '?');
+      container.add(this.add.text(cols.classe, y, `${classEmoji} ${_className}`, {
         fontFamily: FONT_UI, fontSize: '13px', color: textColor,
       }).setOrigin(0, 0.5));
       container.add(this.add.text(cols.classe + 120, y, resultMark, {
@@ -376,7 +441,7 @@ export class StatsScene extends Phaser.Scene {
   // Back button
   // ----------------------------------------------------------------
   _buildBackButton(width, height) {
-    createButton(this, 100, height - 36, 160, 44, 'INDIETRO', {
+    createButton(this, 100, height - 36, 160, 44, this._t('indietro'), {
       fill: C.bgPanel,
       hover: C.btnHover,
       border: C.borderGold,

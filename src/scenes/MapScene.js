@@ -10,6 +10,230 @@ import { ENEMIES } from '../data/enemies.js';
 import { FLOOR_CONDITIONS } from '../data/floorConditions.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider } from '../ui/Theme.js';
 import { AchievementManager } from '../managers/AchievementManager.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    // Header
+    map: 'MAPPA',
+    mapEndless: 'MAPPA  \u267E Endless x',
+    gold: 'ORO',
+    deck: 'MAZZO',
+    // Node labels
+    combat: 'Combattimento',
+    elite: 'Elite',
+    event: 'Evento',
+    shop: 'Negozio',
+    rest: 'Riposo',
+    boss: 'Boss',
+    // Floor label
+    floor: 'Piano',
+    // Deck overlay
+    deckTitle: 'MAZZO',
+    deckCards: 'carte',
+    deckFilterAll: 'Tutti',
+    deckFilterAttack: '\u2694\uFE0F Attacco',
+    deckFilterDefend: '\uD83D\uDEE1\uFE0F Difesa',
+    deckFilterSkill: '\u2728 Abilit\u00E0',
+    deckSortTypeCostAsc: 'Tipo+Costo \u2191',
+    deckSortCostAsc: 'Costo \u2191',
+    deckSortCostDesc: 'Costo \u2193',
+    deckNoCards: 'Nessuna carta per questo filtro',
+    deckClose: 'CHIUDI',
+    deckShownOf: '/',
+    // Card type labels (forge / deck)
+    typeAttack: 'Attacco',
+    typeDefend: 'Difesa',
+    typeSkill: 'Abilit\u00E0',
+    typeCurse: 'Maledizione',
+    // Rest overlay
+    restTitle: 'Campo di Riposo',
+    restSubtitle: 'Scegli come trascorrere la notte',
+    restBtnLabel: '\uD83D\uDECC Riposa',
+    restBtnRecover: 'Recupera',
+    restBtnHp: 'HP',
+    restBtnPct35: "(35% dell'HP massimo)",
+    restBtnPct25: "(25% dell'HP massimo)",
+    restForgeLabel: '\u2692 Forgia',
+    restForgeDesc: 'Upgrada una carta',
+    restForgeSub: 'del tuo mazzo',
+    restForgeNone: '(nessuna carta disponibile)',
+    restResultClick: 'Clicca per continuare',
+    restHpRestored: 'HP recuperati.\nBuon riposo, guerriero.',
+    // Forge screen
+    forgeTitle: '\u2692 FORGIA',
+    forgeSub: 'Scegli una carta da upgradare',
+    forgeCancel: 'Annulla',
+    forgeUpgraded: 'Carta upgradrata:\n',
+    // Undo button
+    undoBtn: '\u21A9 Annulla',
+    undoTitle: '\u21A9 Annulla ultima azione?',
+    undoNodeLabel: 'Nodo da annullare: ',
+    undoDesc: 'Tornerai alla posizione precedente sulla mappa.',
+    undoConfirm: 'CONFERMA',
+    undoCancel: 'ANNULLA',
+    undoTypeShop: 'Negozio \uD83D\uDED2',
+    undoTypeEvent: 'Evento \uD83D\uDFE3',
+    undoTypeRest: 'Riposo \uD83D\uDFE2',
+    // Shop
+    shopTitle: 'NEGOZIO',
+    shopGoldAvail: 'oro disponibili',
+    shopRarityCommon: 'COMUNE',
+    shopRarityUncommon: 'NON COMUNE',
+    shopRarityRare: 'RARA',
+    shopPotions: '— POZIONI —',
+    shopBought: 'Comprata!',
+    shopRemoveTitle: '\uD83D\uDDD1\uFE0F RIMUOVI DAL MAZZO',
+    shopRemoveSmall: 'Mazzo troppo piccolo (minimo 5 carte)',
+    shopRemoveNone: 'Nessuna carta rimovibile',
+    shopRemovePoorGold: 'oro  (oro insufficiente)',
+    shopRemovePrompt: 'oro  \u2014  clicca una carta per rimuoverla',
+    shopChooseRemove: 'Scegli carta da rimuovere',
+    shopExit: 'Esci dal negozio',
+    // Card removal screen
+    removeTitle: 'SCEGLI UNA CARTA DA RIMUOVERE',
+    removeSub: 'Clicca su una carta per rimuoverla dal mazzo',
+    removeCancel: 'Annulla',
+    // Event overlay
+    eventResult: 'Risultato',
+    eventClick: 'Clicca per continuare',
+    // Endless overlay
+    endlessBossTitle: '\uD83C\uDFC6 Boss in vista!',
+    endlessBossDesc: 'Vuoi continuare la run dopo aver sconfitto il boss?',
+    endlessDifficulty: 'Difficolt\u00E0 Endless: ',
+    endlessContinueBtn: '\u267E CONTINUA',
+    endlessContinueSub: '(Endless Mode)',
+    endlessEndBtn: 'TERMINA',
+    endlessEndSub: 'la run dopo il boss',
+    // Tutorial
+    tutStep1: "Qui trovi i tuoi HP, oro e reliquie. Tienili d'occhio durante la run.",
+    tutStep2: "Clicca sui nodi raggiungibili (luminosi) per avanzare.\n\u2694\uFE0F combattimento  \uD83D\uDFE1 elite  \uD83D\uDFE3 evento  \uD83D\uDED2 shop  \uD83D\uDFE2 riposo  \uD83D\uDC80 boss",
+    tutStep3: 'Clicca MAZZO per vedere tutte le tue carte. Pi\u00F9 carte forti = pi\u00F9 chance di sopravvivere.',
+    tutStep4: 'Sei pronto! Costruisci il tuo mazzo e sconfiggi il boss. Buona fortuna!',
+    tutStart: "INIZIA L'AVVENTURA",
+    tutNext: 'AVANTI \u2192',
+    tutSkip: 'SALTA',
+    // Currency word (for price displays)
+    goldWord: 'oro',
+    // Enemy tooltip
+    enemyPreview: 'Anteprima nemico',
+    enemyAvgDmg: 'Dmg medio: ',
+    // Forge value labels
+    forgeStr: 'Forza',
+    forgeDraw: 'Pesca',
+    forgeValue: 'Valore',
+  },
+  en: {
+    // Header
+    map: 'MAP',
+    mapEndless: 'MAP  \u267E Endless x',
+    gold: 'GOLD',
+    deck: 'DECK',
+    // Node labels
+    combat: 'Combat',
+    elite: 'Elite',
+    event: 'Event',
+    shop: 'Shop',
+    rest: 'Rest',
+    boss: 'Boss',
+    // Floor label
+    floor: 'Floor',
+    // Deck overlay
+    deckTitle: 'DECK',
+    deckCards: 'cards',
+    deckFilterAll: 'All',
+    deckFilterAttack: '\u2694\uFE0F Attack',
+    deckFilterDefend: '\uD83D\uDEE1\uFE0F Defense',
+    deckFilterSkill: '\u2728 Skill',
+    deckSortTypeCostAsc: 'Type+Cost \u2191',
+    deckSortCostAsc: 'Cost \u2191',
+    deckSortCostDesc: 'Cost \u2193',
+    deckNoCards: 'No cards for this filter',
+    deckClose: 'CLOSE',
+    deckShownOf: '/',
+    // Card type labels (forge / deck)
+    typeAttack: 'Attack',
+    typeDefend: 'Defense',
+    typeSkill: 'Skill',
+    typeCurse: 'Curse',
+    // Rest overlay
+    restTitle: 'Rest Site',
+    restSubtitle: 'Choose how to spend the night',
+    restBtnLabel: '\uD83D\uDECC Rest',
+    restBtnRecover: 'Recover',
+    restBtnHp: 'HP',
+    restBtnPct35: '(35% of max HP)',
+    restBtnPct25: '(25% of max HP)',
+    restForgeLabel: '\u2692 Forge',
+    restForgeDesc: 'Upgrade a card',
+    restForgeSub: 'from your deck',
+    restForgeNone: '(no cards available)',
+    restResultClick: 'Click to continue',
+    restHpRestored: 'HP restored.\nRest well, warrior.',
+    // Forge screen
+    forgeTitle: '\u2692 FORGE',
+    forgeSub: 'Choose a card to upgrade',
+    forgeCancel: 'Cancel',
+    forgeUpgraded: 'Card upgraded:\n',
+    // Undo button
+    undoBtn: '\u21A9 Undo',
+    undoTitle: '\u21A9 Undo last action?',
+    undoNodeLabel: 'Node to undo: ',
+    undoDesc: 'You will return to your previous position on the map.',
+    undoConfirm: 'CONFIRM',
+    undoCancel: 'CANCEL',
+    undoTypeShop: 'Shop \uD83D\uDED2',
+    undoTypeEvent: 'Event \uD83D\uDFE3',
+    undoTypeRest: 'Rest \uD83D\uDFE2',
+    // Shop
+    shopTitle: 'SHOP',
+    shopGoldAvail: 'gold available',
+    shopRarityCommon: 'COMMON',
+    shopRarityUncommon: 'UNCOMMON',
+    shopRarityRare: 'RARE',
+    shopPotions: '— POTIONS —',
+    shopBought: 'Bought!',
+    shopRemoveTitle: '\uD83D\uDDD1\uFE0F REMOVE FROM DECK',
+    shopRemoveSmall: 'Deck too small (minimum 5 cards)',
+    shopRemoveNone: 'No removable cards',
+    shopRemovePoorGold: 'gold  (not enough gold)',
+    shopRemovePrompt: 'gold  \u2014  click a card to remove it',
+    shopChooseRemove: 'Choose card to remove',
+    shopExit: 'Leave the shop',
+    // Card removal screen
+    removeTitle: 'CHOOSE A CARD TO REMOVE',
+    removeSub: 'Click a card to remove it from your deck',
+    removeCancel: 'Cancel',
+    // Event overlay
+    eventResult: 'Result',
+    eventClick: 'Click to continue',
+    // Endless overlay
+    endlessBossTitle: '\uD83C\uDFC6 Boss ahead!',
+    endlessBossDesc: 'Do you want to continue the run after defeating the boss?',
+    endlessDifficulty: 'Endless Difficulty: ',
+    endlessContinueBtn: '\u267E CONTINUE',
+    endlessContinueSub: '(Endless Mode)',
+    endlessEndBtn: 'END',
+    endlessEndSub: 'the run after the boss',
+    // Tutorial
+    tutStep1: 'Here you can see your HP, gold and relics. Keep an eye on them during the run.',
+    tutStep2: 'Click reachable (glowing) nodes to advance.\n\u2694\uFE0F combat  \uD83D\uDFE1 elite  \uD83D\uDFE3 event  \uD83D\uDED2 shop  \uD83D\uDFE2 rest  \uD83D\uDC80 boss',
+    tutStep3: 'Click DECK to see all your cards. Stronger cards = better chances of survival.',
+    tutStep4: "You're ready! Build your deck and defeat the boss. Good luck!",
+    tutStart: 'START THE ADVENTURE',
+    tutNext: 'NEXT \u2192',
+    tutSkip: 'SKIP',
+    // Currency word (for price displays)
+    goldWord: 'gold',
+    // Enemy tooltip
+    enemyPreview: 'Enemy preview',
+    enemyAvgDmg: 'Avg dmg: ',
+    // Forge value labels
+    forgeStr: 'Strength',
+    forgeDraw: 'Draw',
+    forgeValue: 'Value',
+  },
+};
 
 const F = FONT_UI;
 
@@ -58,6 +282,9 @@ export class MapScene extends Phaser.Scene {
   }
 
   create() {
+    this._lang = LocaleManager.getLang();
+    this._t = k => (T[this._lang] || T.it)[k] ?? T.it[k];
+
     const { width, height } = this.scale;
 
     MusicManager.start(this, 0.28);
@@ -81,12 +308,12 @@ export class MapScene extends Phaser.Scene {
 
     // Node styles
     this.nodeStyles = {
-      combat: { icon: 'node-combat', color: 0xe85d5d, label: 'Combattimento' },
-      elite:  { icon: 'node-elite',  color: 0xe8b84b, label: 'Elite' },
-      event:  { icon: 'node-event',  color: 0xb07be8, label: 'Evento' },
-      shop:   { icon: 'node-shop',   color: 0xe8b84b, label: 'Negozio' },
-      rest:   { icon: 'node-rest',   color: 0x5dc77a, label: 'Riposo' },
-      boss:   { icon: 'node-boss',   color: 0xe85d5d, label: 'Boss' },
+      combat: { icon: 'node-combat', color: 0xe85d5d, label: this._t('combat') },
+      elite:  { icon: 'node-elite',  color: 0xe8b84b, label: this._t('elite') },
+      event:  { icon: 'node-event',  color: 0xb07be8, label: this._t('event') },
+      shop:   { icon: 'node-shop',   color: 0xe8b84b, label: this._t('shop') },
+      rest:   { icon: 'node-rest',   color: 0x5dc77a, label: this._t('rest') },
+      boss:   { icon: 'node-boss',   color: 0xe85d5d, label: this._t('boss') },
     };
 
     // Header panel
@@ -102,14 +329,14 @@ export class MapScene extends Phaser.Scene {
 
     // Titolo mappa — mostra badge Endless se attivo
     const mapTitle = this.runData.endlessMode
-      ? `MAPPA  \u267E Endless x${this.runData.endlessDepth || 1}`
-      : 'MAPPA';
+      ? `${this._t('mapEndless')}${this.runData.endlessDepth || 1}`
+      : this._t('map');
     const mapTitleColor = this.runData.endlessMode ? '#e8b84b' : '#f4e4c8';
     this.add.text(width / 2, 22, mapTitle, {
       fontFamily: FONT_TITLE, fontSize: '16px', color: '#c9a84c', fontStyle: '700', letterSpacing: 4
     }).setOrigin(0.5).setDepth(51);
 
-    this.add.text(width - 20, 22, `${this.runData.gold} ORO`, {
+    this.add.text(width - 20, 22, `${this.runData.gold} ${this._t('gold')}`, {
       fontFamily: F, fontSize: '13px', color: '#c9a84c', fontStyle: '700'
     }).setOrigin(1, 0.5).setDepth(51);
 
@@ -124,7 +351,7 @@ export class MapScene extends Phaser.Scene {
 
       let tooltipBg, tooltipText;
       bg.on('pointerover', () => {
-        const label = `${relic.name}\n${relic.description}`;
+        const label = `${LocaleManager.name(relic)}\n${LocaleManager.desc(relic)}`;
         const tx = Math.min(rx + 110, width - 110);
         tooltipBg = this.add.rectangle(tx, ry + 35, 210, 46, C.bgPanelDark, 0.97)
           .setStrokeStyle(1, C.borderGoldDim).setDepth(200);
@@ -147,7 +374,7 @@ export class MapScene extends Phaser.Scene {
 
     // Bottone Deck Preview (1C)
     const deckCards = this.runData.deckCards || STARTER_DECK;
-    const deckBtn = this.add.text(width - 20, 52, `MAZZO (${deckCards.length})`, {
+    const deckBtn = this.add.text(width - 20, 52, `${this._t('deck')} (${deckCards.length})`, {
       fontFamily: F, fontSize: '11px', color: '#4a8aaf', fontStyle: '700'
     }).setOrigin(1, 0.5).setDepth(51).setInteractive({ useHandCursor: true });
 
@@ -233,7 +460,7 @@ export class MapScene extends Phaser.Scene {
         bg.lineStyle(2, C.borderGold, 1);
         bg.strokeRoundedRect(px - 140, py - 24, 290, 48, 8);
         bg.setAlpha(0);
-        const txt = this.add.text(px, py, `🏆 ${ach.name}`, {
+        const txt = this.add.text(px, py, `🏆 ${LocaleManager.name(ach)}`, {
           fontFamily: FONT_UI, fontSize: '13px', color: '#f0d880', fontStyle: '700'
         }).setOrigin(0.5).setDepth(301).setAlpha(0);
         this.tweens.add({ targets: [bg, txt], alpha: 1, duration: 300 });
@@ -479,7 +706,7 @@ export class MapScene extends Phaser.Scene {
       const hp = enemy.hp;
       if (hp < minHp) minHp = hp;
       if (hp > maxHp) maxHp = hp;
-      names.push(`${enemy.emoji} ${enemy.name}`);
+      names.push(`${enemy.emoji} ${LocaleManager.name(enemy)}`);
 
       const pattern = enemy.phases ? enemy.phases[0].pattern : (enemy.pattern || []);
       pattern.forEach(action => {
@@ -496,7 +723,8 @@ export class MapScene extends Phaser.Scene {
     // Mostra fino a 3 nomi di nemici possibili
     const displayNames = names.slice(0, 3).join(', ') + (names.length > 3 ? '…' : '');
 
-    return `${displayNames}\nHP: ${hpRange}  |  Dmg medio: ${avgDmg}`;
+    const t = k => (T[this._lang] || T.it)[k] ?? T.it[k];
+    return `${displayNames}\nHP: ${hpRange}  |  ${t('enemyAvgDmg')}${avgDmg}`;
   }
 
   getNodeX(col, totalCols) {
@@ -590,11 +818,11 @@ export class MapScene extends Phaser.Scene {
     G(this.add.rectangle(width / 2, height / 2, 500, 220, C.bgPanel)
       .setStrokeStyle(2, C.borderGold).setDepth(201));
 
-    G(this.add.text(width / 2, height / 2 - 75, 'Campo di Riposo', {
+    G(this.add.text(width / 2, height / 2 - 75, this._t('restTitle'), {
       fontFamily: FONT_TITLE, fontSize: '20px', color: '#e8b84b', fontStyle: '700'
     }).setOrigin(0.5).setDepth(202));
 
-    G(this.add.text(width / 2, height / 2 - 48, 'Scegli come trascorrere la notte', {
+    G(this.add.text(width / 2, height / 2 - 48, this._t('restSubtitle'), {
       fontFamily: F, fontSize: '12px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(202));
 
@@ -605,15 +833,15 @@ export class MapScene extends Phaser.Scene {
     const btnRiposa = G(this.add.rectangle(width / 2 - 120, height / 2 + 10, 200, 80, C.btnSuccess)
       .setStrokeStyle(2, 0x5dc77a).setInteractive({ useHandCursor: true }).setDepth(202));
 
-    G(this.add.text(width / 2 - 120, height / 2 - 15, '🛌 Riposa', {
+    G(this.add.text(width / 2 - 120, height / 2 - 15, this._t('restBtnLabel'), {
       fontFamily: F, fontSize: '15px', color: '#5dc77a', fontStyle: '700'
     }).setOrigin(0.5).setDepth(203));
 
-    G(this.add.text(width / 2 - 120, height / 2 + 12, `Recupera ${healAmount} HP`, {
+    G(this.add.text(width / 2 - 120, height / 2 + 12, `${this._t('restBtnRecover')} ${healAmount} ${this._t('restBtnHp')}`, {
       fontFamily: F, fontSize: '11px', color: '#a0d0a0'
     }).setOrigin(0.5).setDepth(203));
 
-    G(this.add.text(width / 2 - 120, height / 2 + 28, `(${this.runData.perkHpRecovery ? '35' : '25'}% dell'HP massimo)`, {
+    G(this.add.text(width / 2 - 120, height / 2 + 28, this.runData.perkHpRecovery ? this._t('restBtnPct35') : this._t('restBtnPct25'), {
       fontFamily: F, fontSize: '9px', color: '#6a9a6a'
     }).setOrigin(0.5).setDepth(203));
 
@@ -624,7 +852,7 @@ export class MapScene extends Phaser.Scene {
       SaveManager.saveRun(this.runData);
       restGroup.getChildren().forEach(c => c.destroy());
       restGroup.destroy(true);
-      this._showRestResult(`+${healAmount} HP recuperati.\nBuon riposo, guerriero.`, 0x5dc77a);
+      this._showRestResult(`+${healAmount} ${this._t('restHpRestored')}`, 0x5dc77a);
     });
 
     // --- Bottone FORGIA ---
@@ -637,15 +865,15 @@ export class MapScene extends Phaser.Scene {
       .setStrokeStyle(2, canForge ? C.borderGold : 0x444450)
       .setInteractive({ useHandCursor: canForge }).setDepth(202));
 
-    G(this.add.text(width / 2 + 120, height / 2 - 15, '⚒ Forgia', {
+    G(this.add.text(width / 2 + 120, height / 2 - 15, this._t('restForgeLabel'), {
       fontFamily: F, fontSize: '15px', color: canForge ? '#e8b84b' : '#666670', fontStyle: '700'
     }).setOrigin(0.5).setDepth(203));
 
-    G(this.add.text(width / 2 + 120, height / 2 + 12, 'Upgrada una carta', {
+    G(this.add.text(width / 2 + 120, height / 2 + 12, this._t('restForgeDesc'), {
       fontFamily: F, fontSize: '11px', color: canForge ? '#d4c080' : '#555560'
     }).setOrigin(0.5).setDepth(203));
 
-    G(this.add.text(width / 2 + 120, height / 2 + 28, canForge ? 'del tuo mazzo' : '(nessuna carta disponibile)', {
+    G(this.add.text(width / 2 + 120, height / 2 + 28, canForge ? this._t('restForgeSub') : this._t('restForgeNone'), {
       fontFamily: F, fontSize: '9px', color: canForge ? '#a89040' : '#444450'
     }).setOrigin(0.5).setDepth(203));
 
@@ -672,7 +900,7 @@ export class MapScene extends Phaser.Scene {
       align: 'center', wordWrap: { width: 360 }
     }).setOrigin(0.5).setDepth(211);
 
-    this.add.text(width / 2, height / 2 + 50, 'Clicca per continuare', {
+    this.add.text(width / 2, height / 2 + 50, this._t('restResultClick'), {
       fontFamily: F, fontSize: '11px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(211);
 
@@ -694,11 +922,11 @@ export class MapScene extends Phaser.Scene {
     G(this.add.rectangle(width / 2, 40, width, 68, C.bgPanel, 1)
       .setStrokeStyle(0).setDepth(211));
 
-    G(this.add.text(width / 2, 22, '⚒ FORGIA', {
+    G(this.add.text(width / 2, 22, this._t('forgeTitle'), {
       fontFamily: FONT_TITLE, fontSize: '20px', color: '#e8b84b', fontStyle: '700'
     }).setOrigin(0.5).setDepth(212));
 
-    G(this.add.text(width / 2, 48, 'Scegli una carta da upgradare', {
+    G(this.add.text(width / 2, 48, this._t('forgeSub'), {
       fontFamily: F, fontSize: '12px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(212));
 
@@ -742,7 +970,7 @@ export class MapScene extends Phaser.Scene {
           SaveManager.saveRun(this.runData);
           forgeGroup.getChildren().forEach(c => c.destroy());
           forgeGroup.destroy(true);
-          this._showRestResult(`Carta upgradrata:\n${card.name}`, 0xe8b84b);
+          this._showRestResult(`${this._t('forgeUpgraded')}${LocaleManager.name(card)}`, 0xe8b84b);
         });
       }
 
@@ -750,15 +978,15 @@ export class MapScene extends Phaser.Scene {
       G(this.add.image(x - cardW / 2 + 26, y, iconKey).setScale(0.65).setDepth(213));
 
       const nameColor = canUpgrade ? '#f4e4c8' : '#666670';
-      G(this.add.text(x + 10, y - 12, card.name, {
+      G(this.add.text(x + 10, y - 12, LocaleManager.name(card), {
         fontFamily: F, fontSize: '12px', color: nameColor, fontStyle: '700'
       }).setOrigin(0.5).setDepth(213));
 
-      const typeLabel = { attack: 'Attacco', defend: 'Difesa', skill: 'Abilità', curse: 'Maledizione' };
+      const typeLabel = { attack: this._t('typeAttack'), defend: this._t('typeDefend'), skill: this._t('typeSkill'), curse: this._t('typeCurse') };
       const valLabel = isCurse ? '' :
-        card.type === 'skill' && card.extraStrength ? `Forza: ${card.extraStrength}` :
-        card.type === 'skill' && card.drawCards   ? `Pesca: ${card.drawCards}` :
-        `Valore: ${card.value}`;
+        card.type === 'skill' && card.extraStrength ? `${this._t('forgeStr')}: ${card.extraStrength}` :
+        card.type === 'skill' && card.drawCards   ? `${this._t('forgeDraw')}: ${card.drawCards}` :
+        `${this._t('forgeValue')}: ${card.value}`;
 
       G(this.add.text(x + 10, y + 8, `${typeLabel[card.type] || card.type} | ${valLabel}`, {
         fontFamily: F, fontSize: '10px',
@@ -775,7 +1003,7 @@ export class MapScene extends Phaser.Scene {
     // Pulsante annulla
     const cancelBtn = G(this.add.rectangle(width / 2, height - 38, 160, 36, C.bgPanel)
       .setStrokeStyle(1.5, C.borderGold).setInteractive({ useHandCursor: true }).setDepth(212));
-    G(this.add.text(width / 2, height - 38, 'Annulla', {
+    G(this.add.text(width / 2, height - 38, this._t('forgeCancel'), {
       fontFamily: FONT_UI, fontSize: '13px', color: '#e8b84b', fontStyle: '700'
     }).setOrigin(0.5).setDepth(213));
 
@@ -792,23 +1020,29 @@ export class MapScene extends Phaser.Scene {
     if (card.type === 'attack') {
       card.value += 3;
       card.name += ' ✦';
+      card.nameEn = (card.nameEn || card.name.replace(' ✦', '')) + ' ✦';
       card.description = card.description.replace(/(\d+) danni/, (m, n) => `${parseInt(n) + 3} danni`);
+      card.descriptionEn = (card.descriptionEn || '').replace(/(\d+) damage/, (m, n) => `${parseInt(n) + 3} damage`);
     } else if (card.type === 'defend') {
       card.value += 3;
       card.name += ' ✦';
+      card.nameEn = (card.nameEn || card.name.replace(' ✦', '')) + ' ✦';
       card.description = card.description.replace(/(\d+) blocco/, (m, n) => `${parseInt(n) + 3} blocco`);
+      card.descriptionEn = (card.descriptionEn || '').replace(/(\d+) block/, (m, n) => `${parseInt(n) + 3} block`);
     } else if (card.type === 'skill') {
       if (card.extraStrength !== undefined) {
         card.extraStrength += 2;
         card.description = card.description.replace(/\+(\d+) forza/, (m, n) => `+${parseInt(n) + 2} forza`);
+        card.descriptionEn = (card.descriptionEn || '').replace(/\+(\d+) strength/, (m, n) => `+${parseInt(n) + 2} strength`);
       } else {
         card.drawCards = (card.drawCards || 0) + 1;
         card.description = card.description.replace(/Pesca (\d+) cart/, (m, n) => `Pesca ${parseInt(n) + 1} cart`);
-        if (!card.description.includes('Pesca')) {
-          card.description += `\nPesca 1 carta.`;
-        }
+        if (!card.description.includes('Pesca')) card.description += `\nPesca 1 carta.`;
+        card.descriptionEn = (card.descriptionEn || '').replace(/Draw (\d+) card/, (m, n) => `Draw ${parseInt(n) + 1} card`);
+        if (!(card.descriptionEn || '').includes('Draw')) card.descriptionEn = (card.descriptionEn || '') + `\nDraw 1 card.`;
       }
       card.name += ' ✦';
+      card.nameEn = (card.nameEn || card.name.replace(' ✦', '')) + ' ✦';
     }
   }
 
@@ -834,10 +1068,13 @@ export class MapScene extends Phaser.Scene {
       // 1. Mercante Ambulante
       {
         title: 'Mercante Ambulante',
+        titleEn: 'Wandering Merchant',
         text: 'Un mercante misterioso ti offre una reliquia in cambio di oro.',
+        textEn: 'A mysterious merchant offers you a relic in exchange for gold.',
         choices: [
           {
             label: '💰 Paga 20 oro',
+            labelEn: '💰 Pay 20 gold',
             condition: (r) => r.gold >= 20,
             effect: (r) => {
               r.gold -= 20;
@@ -846,54 +1083,69 @@ export class MapScene extends Phaser.Scene {
               try {
                 const relic = generateRelic('normal');
                 r.relics.push(relic);
-                return `Hai ottenuto: ${relic.emoji} ${relic.name}`;
+                return LocaleManager.isEn()
+                  ? `Obtained: ${relic.emoji} ${LocaleManager.name(relic)}`
+                  : `Hai ottenuto: ${relic.emoji} ${LocaleManager.name(relic)}`;
               } catch(e) {
                 r.gold += 10;
-                return 'Il mercante scappa con i tuoi soldi... (+10 oro recuperati)';
+                return LocaleManager.isEn()
+                  ? 'The merchant runs off with your gold... (+10 gold recovered)'
+                  : 'Il mercante scappa con i tuoi soldi... (+10 oro recuperati)';
               }
             }
           },
-          { label: '❌ Rifiuta', effect: () => 'Il mercante se ne va fischiettando.' }
+          { label: '❌ Rifiuta', labelEn: '❌ Refuse', effect: () => LocaleManager.isEn() ? 'The merchant walks away whistling.' : 'Il mercante se ne va fischiettando.' }
         ]
       },
 
       // 2. Altare Sacrificale
       {
         title: 'Altare Sacrificale',
+        titleEn: 'Sacrificial Altar',
         text: 'Un altare oscuro promette potere in cambio di sangue versato.',
+        textEn: 'A dark altar promises power in exchange for blood.',
         choices: [
           {
             label: '🩸 Paga 15 HP (carta rara)',
+            labelEn: '🩸 Pay 15 HP (rare card)',
             condition: (r) => r.playerHp > 20,
             effect: (r) => {
               r.playerHp -= 15;
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const card = REWARD_CARDS.rare[Math.floor(Math.random() * REWARD_CARDS.rare.length)];
               r.deckCards.push({ ...card });
-              return `Sacrificio accettato!\n+1 carta rara: ${card.name}`;
+              return LocaleManager.isEn()
+                ? `Sacrifice accepted!\n+1 rare card: ${LocaleManager.name(card)}`
+                : `Sacrificio accettato!\n+1 carta rara: ${LocaleManager.name(card)}`;
             }
           },
-          { label: '🚶 Ignora', effect: () => 'Passi oltre in silenzio.' }
+          { label: '🚶 Ignora', labelEn: '🚶 Ignore', effect: () => LocaleManager.isEn() ? 'You pass by in silence.' : 'Passi oltre in silenzio.' }
         ]
       },
 
       // 3. Biblioteca Abbandonata
       {
         title: 'Biblioteca Abbandonata',
+        titleEn: 'Abandoned Library',
         text: 'Scaffali polverosi custodiscono antichi grimori di battaglia.',
+        textEn: 'Dusty shelves hold ancient battle grimoires.',
         choices: [
           {
             label: '📖 Prendi una carta comune (gratis)',
+            labelEn: '📖 Take a common card (free)',
             effect: (r) => {
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const card = REWARD_CARDS.common[Math.floor(Math.random() * REWARD_CARDS.common.length)];
               r.deckCards.push({ ...card });
               r.flags.visitedLibrary = true;
-              return `Aggiunta al mazzo: ${card.name}`;
+              return LocaleManager.isEn()
+                ? `Added to deck: ${LocaleManager.name(card)}`
+                : `Aggiunta al mazzo: ${LocaleManager.name(card)}`;
             }
           },
           {
             label: '📕 Paga 5 HP per una rara',
+            labelEn: '📕 Pay 5 HP for a rare',
             condition: (r) => r.playerHp > 10,
             effect: (r) => {
               r.playerHp -= 5;
@@ -901,7 +1153,9 @@ export class MapScene extends Phaser.Scene {
               const card = REWARD_CARDS.rare[Math.floor(Math.random() * REWARD_CARDS.rare.length)];
               r.deckCards.push({ ...card });
               r.flags.visitedLibrary = true;
-              return `Aggiunta: ${card.name}\n(-5 HP)`;
+              return LocaleManager.isEn()
+                ? `Added: ${LocaleManager.name(card)}\n(-5 HP)`
+                : `Aggiunta: ${LocaleManager.name(card)}\n(-5 HP)`;
             }
           }
         ]
@@ -910,27 +1164,31 @@ export class MapScene extends Phaser.Scene {
       // 4. Campeggio Abbandonato
       {
         title: 'Campeggio Abbandonato',
+        titleEn: 'Abandoned Camp',
         text: 'Un vecchio accampamento. Puoi riposare o cercare risorse.',
+        textEn: 'An old campsite. You can rest or search for resources.',
         choices: [
           {
             label: '🛌 Riposa (+20% HP)',
+            labelEn: '🛌 Rest (+20% HP)',
             effect: (r) => {
               const heal = Math.floor(r.maxHp * 0.2);
               r.playerHp = Math.min(r.maxHp, r.playerHp + heal);
-              return `+${heal} HP recuperati.`;
+              return LocaleManager.isEn() ? `+${heal} HP restored.` : `+${heal} HP recuperati.`;
             }
           },
           {
             label: '🔍 Cerca risorse (+30 oro, rischio)',
+            labelEn: '🔍 Search for resources (+30 gold, risky)',
             effect: (r) => {
               if (Math.random() < 0.5) {
                 r.gold += 30;
-                return '+30 oro trovati!';
+                return LocaleManager.isEn() ? '+30 gold found!' : '+30 oro trovati!';
               } else {
                 const dmg = 10;
                 r.playerHp = Math.max(1, r.playerHp - dmg);
                 r.gold += 15;
-                return `Trappola! -${dmg} HP ma +15 oro.`;
+                return LocaleManager.isEn() ? `Trap! -${dmg} HP but +15 gold.` : `Trappola! -${dmg} HP ma +15 oro.`;
               }
             }
           }
@@ -940,143 +1198,177 @@ export class MapScene extends Phaser.Scene {
       // 5. Spirito della Foresta
       {
         title: 'Spirito della Foresta',
+        titleEn: 'Forest Spirit',
         text: 'Uno spirito antico offre di alleggerire il peso del tuo mazzo.',
+        textEn: 'An ancient spirit offers to lighten the weight of your deck.',
         choices: [
           {
             label: '✨ Rimuovi carta casuale (gratis)',
+            labelEn: '✨ Remove a random card (free)',
             condition: (r) => (r.deckCards || STARTER_DECK).length > 6,
             effect: (r) => {
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const idx = Math.floor(Math.random() * r.deckCards.length);
               const removed = r.deckCards.splice(idx, 1)[0];
               r.flags.helpedSpirit = true;
-              return `Lo spirito ha rimosso: ${removed.name}`;
+              return LocaleManager.isEn()
+                ? `The spirit removed: ${LocaleManager.name(removed)}`
+                : `Lo spirito ha rimosso: ${LocaleManager.name(removed)}`;
             }
           },
-          { label: '🚶 Ignora', effect: () => 'Lo spirito svanisce come nebbia.' }
+          { label: '🚶 Ignora', labelEn: '🚶 Ignore', effect: () => LocaleManager.isEn() ? 'The spirit fades like mist.' : 'Lo spirito svanisce come nebbia.' }
         ]
       },
 
       // 6. Armaiolo
       {
         title: 'Armaiolo',
+        titleEn: 'Armorer',
         text: 'Un armaiolo offre di rafforzare la tua armatura per un compenso.',
+        textEn: 'An armorer offers to strengthen your armor for a fee.',
         choices: [
           {
             label: '🛡️ Paga 40 oro (+10 HP max)',
+            labelEn: '🛡️ Pay 40 gold (+10 max HP)',
             condition: (r) => r.gold >= 40,
             effect: (r) => {
               r.gold -= 40;
               r.maxHp += 10;
               r.playerHp += 10;
-              return '+10 HP massimi!\n(-40 oro)';
+              return LocaleManager.isEn()
+                ? '+10 max HP!\n(-40 gold)'
+                : '+10 HP massimi!\n(-40 oro)';
             }
           },
-          { label: '🚶 Ignora', effect: () => 'Non ne hai bisogno adesso.' }
+          { label: '🚶 Ignora', labelEn: '🚶 Ignore', effect: () => LocaleManager.isEn() ? "You don't need it right now." : 'Non ne hai bisogno adesso.' }
         ]
       },
 
       // 7. Alchimista Pazzo
       {
         title: 'Alchimista Pazzo',
+        titleEn: 'Mad Alchemist',
         text: 'Un alchimista vorrrebbe trasformare una carta del tuo mazzo.',
+        textEn: 'An alchemist wants to transform a card from your deck.',
         choices: [
           {
             label: '⚗️ Lascialo lavorare (rischio)',
+            labelEn: '⚗️ Let him work (risky)',
             condition: (r) => (r.deckCards || []).length > 0,
             effect: (r) => {
-              if (!r.deckCards || r.deckCards.length === 0) return 'Mazzo vuoto!';
+              if (!r.deckCards || r.deckCards.length === 0) return LocaleManager.isEn() ? 'Empty deck!' : 'Mazzo vuoto!';
               const idx = Math.floor(Math.random() * r.deckCards.length);
               const oldCard = r.deckCards[idx];
               if (Math.random() < 0.3) {
                 const newCard = STARTER_DECK[Math.floor(Math.random() * STARTER_DECK.length)];
                 r.deckCards[idx] = { ...newCard };
-                return `${oldCard.name} → ${newCard.name}\n(peggiorata!)`;
+                return LocaleManager.isEn()
+                  ? `${LocaleManager.name(oldCard)} → ${LocaleManager.name(newCard)}\n→ (downgraded!)`
+                  : `${LocaleManager.name(oldCard)} → ${LocaleManager.name(newCard)}\n→ (peggiorata!)`;
               } else {
                 const pool = Math.random() < 0.5 ? REWARD_CARDS.uncommon : REWARD_CARDS.rare;
                 const newCard = pool[Math.floor(Math.random() * pool.length)];
                 r.deckCards[idx] = { ...newCard };
-                return `${oldCard.name} → ${newCard.name}\n(migliorata!)`;
+                return LocaleManager.isEn()
+                  ? `${LocaleManager.name(oldCard)} → ${LocaleManager.name(newCard)}\n→ (upgraded!)`
+                  : `${LocaleManager.name(oldCard)} → ${LocaleManager.name(newCard)}\n→ (migliorata!)`;
               }
             }
           },
-          { label: '🚶 Rifiuta', effect: () => 'Meglio non rischiare.' }
+          { label: '🚶 Rifiuta', labelEn: '🚶 Refuse', effect: () => LocaleManager.isEn() ? 'Better not to risk it.' : 'Meglio non rischiare.' }
         ]
       },
 
       // 8. Tesoro Nascosto
       {
         title: 'Tesoro Nascosto',
+        titleEn: 'Hidden Treasure',
         text: 'Intravvedi un forziere nascosto tra le rocce. Ha una trappola?',
+        textEn: 'You spot a hidden chest among the rocks. Is it trapped?',
         choices: [
           {
             label: '💎 Apri (+50 oro, -8 HP)',
+            labelEn: '💎 Open (+50 gold, -8 HP)',
             effect: (r) => {
               r.gold += 50;
               const dmg = 8;
               r.playerHp = Math.max(1, r.playerHp - dmg);
-              return `+50 oro!\nScatta una trappola: -${dmg} HP.`;
+              return LocaleManager.isEn()
+                ? `+50 gold!\nA trap springs: -${dmg} HP.`
+                : `+50 oro!\nScatta una trappola: -${dmg} HP.`;
             }
           },
-          { label: '👁️ Lascia perdere', effect: () => 'Meglio non rischiare.' }
+          { label: '👁️ Lascia perdere', labelEn: '👁️ Leave it', effect: () => LocaleManager.isEn() ? 'Better not to risk it.' : 'Meglio non rischiare.' }
         ]
       },
 
       // 9. Oracolo
       {
         title: 'Oracolo',
+        titleEn: 'Oracle',
         text: 'Un essere misterioso vede oltre il tempo. Chiedi consiglio?',
+        textEn: 'A mysterious being sees beyond time. Ask for advice?',
         choices: [
           {
             label: '🔮 Chiedi una visione',
+            labelEn: '🔮 Ask for a vision',
             effect: (r) => {
               r.gold += 20;
-              return 'L\'oracolo ti dona saggezza e 20 oro.';
+              return LocaleManager.isEn() ? 'The oracle grants you wisdom and 20 gold.' : 'L\'oracolo ti dona saggezza e 20 oro.';
             }
           },
-          { label: '🚶 Ignora', effect: () => 'Alcune cose è meglio non sapere.' }
+          { label: '🚶 Ignora', labelEn: '🚶 Ignore', effect: () => LocaleManager.isEn() ? 'Some things are better left unknown.' : 'Alcune cose è meglio non sapere.' }
         ]
       },
 
       // 10. Mercenario
       {
         title: 'Mercenario',
+        titleEn: 'Mercenary',
         text: 'Un guerriero di ventura offre i suoi servizi.',
+        textEn: 'A mercenary warrior offers their services.',
         choices: [
           {
             label: '⚔️ Ingaggialo (60 oro, +5 Forza)',
+            labelEn: '⚔️ Hire them (60 gold, +5 Strength)',
             condition: (r) => r.gold >= 60,
             effect: (r) => {
               r.gold -= 60;
               r.permanentStrength = (r.permanentStrength || 0) + 5;
-              return '+5 Forza permanente!\n(-60 oro)';
+              return LocaleManager.isEn() ? '+5 permanent Strength!\n(-60 gold)' : '+5 Forza permanente!\n(-60 oro)';
             }
           },
-          { label: '🚶 Rifiuta', effect: () => 'Il mercenario se ne va.' }
+          { label: '🚶 Rifiuta', labelEn: '🚶 Refuse', effect: () => LocaleManager.isEn() ? 'The mercenary walks away.' : 'Il mercenario se ne va.' }
         ]
       },
 
       // 11. Pozza Magica
       {
         title: 'Pozza Magica',
+        titleEn: 'Magic Pool',
         text: 'Un\'acqua luminosa e profumata promette guarigione.',
+        textEn: 'A glowing, fragrant water promises healing.',
         choices: [
           {
             label: '💧 Bevi (+20 HP)',
+            labelEn: '💧 Drink (+20 HP)',
             effect: (r) => {
               const heal = Math.min(20, r.maxHp - r.playerHp);
               r.playerHp = Math.min(r.maxHp, r.playerHp + heal);
-              return `+${heal} HP recuperati.`;
+              return LocaleManager.isEn() ? `+${heal} HP restored.` : `+${heal} HP recuperati.`;
             }
           },
           {
             label: '🍶 Bevi due volte (+10 HP + Maledizione)',
+            labelEn: '🍶 Drink twice (+10 HP + Curse)',
             effect: (r) => {
               const heal = Math.min(10, r.maxHp - r.playerHp);
               r.playerHp = Math.min(r.maxHp, r.playerHp + heal);
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               r.deckCards.push({ ...CURSES[1] }); // Affaticamento
-              return `+${heal} HP.\nAffaticamento aggiunto al mazzo!`;
+              return LocaleManager.isEn()
+                ? `+${heal} HP.\nFatigue added to your deck!`
+                : `+${heal} HP.\nAffaticamento aggiunto al mazzo!`;
             }
           }
         ]
@@ -1085,49 +1377,59 @@ export class MapScene extends Phaser.Scene {
       // 12. Contrabbandiere
       {
         title: 'Contrabbandiere',
+        titleEn: 'Smuggler',
         text: 'Un mercante dall\'aria sospetta vende pozioni a buon prezzo.',
+        textEn: 'A shady-looking merchant sells potions at a good price.',
         choices: [
           {
             label: '🧴 Pozione Salute (30 oro)',
+            labelEn: '🧴 Health Potion (30 gold)',
             condition: (r) => r.gold >= 30 && (r.potions || []).length < 3,
             effect: (r) => {
               r.gold -= 30;
               if (!r.potions) r.potions = [];
               r.potions.push({ ...POTIONS.health });
-              return 'Pozione Salute acquistata!\n(-30 oro)';
+              return LocaleManager.isEn() ? 'Health Potion purchased!\n(-30 gold)' : 'Pozione Salute acquistata!\n(-30 oro)';
             }
           },
           {
             label: '🔋 Pozione Energia (30 oro)',
+            labelEn: '🔋 Energy Potion (30 gold)',
             condition: (r) => r.gold >= 30 && (r.potions || []).length < 3,
             effect: (r) => {
               r.gold -= 30;
               if (!r.potions) r.potions = [];
               r.potions.push({ ...POTIONS.energy });
-              return 'Pozione Energia acquistata!\n(-30 oro)';
+              return LocaleManager.isEn() ? 'Energy Potion purchased!\n(-30 gold)' : 'Pozione Energia acquistata!\n(-30 oro)';
             }
           },
-          { label: '🚶 No grazie', effect: () => 'Il contrabbandiere si nasconde.' }
+          { label: '🚶 No grazie', labelEn: '🚶 No thanks', effect: () => LocaleManager.isEn() ? 'The smuggler slips away.' : 'Il contrabbandiere si nasconde.' }
         ]
       },
 
       // 13. Il Mercante Misterioso
       {
         title: 'Il Mercante Misterioso',
+        titleEn: 'The Mysterious Merchant',
         text: 'Un mercante avvolto in un mantello scuro apre una valigetta piena di carte preziose.',
+        textEn: 'A merchant wrapped in a dark cloak opens a suitcase full of precious cards.',
         choices: [
           {
             label: '🎴 Carta casuale gratis',
+            labelEn: '🎴 Free random card',
             effect: (r) => {
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const allPools = [...REWARD_CARDS.common, ...REWARD_CARDS.uncommon];
               const card = allPools[Math.floor(Math.random() * allPools.length)];
               r.deckCards.push({ ...card });
-              return `Il mercante ti dona: ${card.name}`;
+              return LocaleManager.isEn()
+                ? `The merchant gives you: ${LocaleManager.name(card)}`
+                : `Il mercante ti dona: ${LocaleManager.name(card)}`;
             }
           },
           {
             label: '💰 Paga 40 oro — carta rara casuale',
+            labelEn: '💰 Pay 40 gold — random rare card',
             condition: (r) => r.gold >= 40,
             effect: (r) => {
               r.gold -= 40;
@@ -1135,20 +1437,25 @@ export class MapScene extends Phaser.Scene {
               const pool = REWARD_CARDS.rare;
               const chosen = pool[Math.floor(Math.random() * pool.length)];
               r.deckCards.push({ ...chosen });
-              return `Hai ottenuto: ${chosen.name}\n(-40 oro)`;
+              return LocaleManager.isEn()
+                ? `Obtained: ${LocaleManager.name(chosen)}\n(-40 gold)`
+                : `Hai ottenuto: ${LocaleManager.name(chosen)}\n(-40 oro)`;
             }
           },
-          { label: '🚶 Ignora', effect: () => 'Il mercante scompare tra le ombre.' }
+          { label: '🚶 Ignora', labelEn: '🚶 Ignore', effect: () => LocaleManager.isEn() ? 'The merchant vanishes into the shadows.' : 'Il mercante scompare tra le ombre.' }
         ]
       },
 
       // 14. Il Santuario Corrotto
       {
         title: 'Il Santuario Corrotto',
+        titleEn: 'The Corrupted Sanctuary',
         text: "Un antico santuario emana un'energia oscura. Una voce promette potere in cambio di sacrificio.",
+        textEn: 'An ancient sanctuary emanates dark energy. A voice promises power in exchange for sacrifice.',
         choices: [
           {
             label: '🩸 Sacrifica 15 HP per una reliquia',
+            labelEn: '🩸 Sacrifice 15 HP for a relic',
             condition: (r) => r.playerHp > 20,
             effect: (r) => {
               r.playerHp -= 15;
@@ -1156,63 +1463,79 @@ export class MapScene extends Phaser.Scene {
               try {
                 const relic = generateRelic('elite');
                 r.relics.push(relic);
-                return `Sacrificio accettato!\nHai ottenuto: ${relic.emoji} ${relic.name}\n(-15 HP)`;
+                return LocaleManager.isEn()
+                  ? `Sacrifice accepted!\nObtained: ${relic.emoji} ${LocaleManager.name(relic)}\n(-15 HP)`
+                  : `Sacrificio accettato!\nHai ottenuto: ${relic.emoji} ${LocaleManager.name(relic)}\n(-15 HP)`;
               } catch(e) {
-                return 'Il santuario assorbe il tuo sangue senza donare nulla.\n(-15 HP)';
+                return LocaleManager.isEn()
+                  ? 'The sanctuary absorbs your blood without giving anything.\n(-15 HP)'
+                  : 'Il santuario assorbe il tuo sangue senza donare nulla.\n(-15 HP)';
               }
             }
           },
-          { label: '🚶 Ignora', effect: () => "L'energia oscura si dissolve mentre ti allontani." }
+          { label: '🚶 Ignora', labelEn: '🚶 Ignore', effect: () => LocaleManager.isEn() ? 'The dark energy fades as you walk away.' : "L'energia oscura si dissolve mentre ti allontani." }
         ]
       },
 
       // 15. Il Disertore
       {
         title: 'Il Disertore',
+        titleEn: 'The Deserter',
         text: 'Un soldato lacero ti si avvicina furtivamente. "Ho bisogno di soldi per fuggire. Ti do tutto quello che ho."',
+        textEn: 'A ragged soldier approaches you stealthily. "I need money to escape. I\'ll give you everything I have."',
         choices: [
           {
             label: '⚔️ Accetta — guadagna 50 oro (perdi una carta)',
+            labelEn: '⚔️ Accept — gain 50 gold (lose a card)',
             condition: (r) => (r.deckCards || STARTER_DECK).length > 5,
             effect: (r) => {
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const idx = Math.floor(Math.random() * r.deckCards.length);
               const removed = r.deckCards.splice(idx, 1)[0];
               r.gold += 50;
-              return `Il disertore ti ha consegnato 50 oro.\nHa preso con sé: ${removed.name}`;
+              return LocaleManager.isEn()
+                ? `The deserter gave you 50 gold.\nThey took: ${LocaleManager.name(removed)}`
+                : `Il disertore ti ha consegnato 50 oro.\nHa preso con sé: ${LocaleManager.name(removed)}`;
             }
           },
-          { label: '🚶 Rifiuta', effect: () => 'Il soldato scompare nella foresta.' }
+          { label: '🚶 Rifiuta', labelEn: '🚶 Refuse', effect: () => LocaleManager.isEn() ? 'The soldier disappears into the forest.' : 'Il soldato scompare nella foresta.' }
         ]
       },
 
       // 16. La Profezia
       {
         title: 'La Profezia',
+        titleEn: 'The Prophecy',
         text: 'Una figura spettrale ti blocca il cammino. I suoi occhi sembrano vedere oltre il tempo.',
+        textEn: 'A spectral figure blocks your path. Their eyes seem to see beyond time.',
         choices: [
           {
             label: '🔮 Ascolta la visione (rivela i prossimi nodi)',
+            labelEn: '🔮 Listen to the vision (reveals upcoming nodes)',
             effect: (r) => {
+              const _en = LocaleManager.isEn();
               const map = r.map;
               const nextFloor = (r.currentFloor || 0) + 1;
               const types = [];
               for (let f = nextFloor; f < Math.min(nextFloor + 3, map.floors.length); f++) {
                 const floor = map.floors[f];
                 const nodeTypes = [...new Set(floor.map(n => n.type))];
-                types.push(`Piano ${f + 1}: ${nodeTypes.join('/')}`);
+                types.push(`${_en ? 'Floor' : 'Piano'} ${f + 1}: ${nodeTypes.join('/')}`);
               }
-              if (types.length === 0) return 'La profezia vede solo il vuoto — sei vicino alla fine.';
-              return 'La profezia rivela:\n' + types.join('\n');
+              if (types.length === 0) return _en ? 'The prophecy sees only the void — you are near the end.' : 'La profezia vede solo il vuoto — sei vicino alla fine.';
+              return (_en ? 'The prophecy reveals:\n' : 'La profezia rivela:\n') + types.join('\n');
             }
           },
           {
             label: '❌ Rifiuta la visione (ricevi una maledizione)',
+            labelEn: '❌ Refuse the vision (receive a curse)',
             effect: (r) => {
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const curse = CURSES[Math.floor(Math.random() * CURSES.length)];
               r.deckCards.push({ ...curse });
-              return `La figura ti maledice per la tua arroganza.\n${curse.name} aggiunta al mazzo!`;
+              return LocaleManager.isEn()
+                ? `The figure curses you for your arrogance.\n${LocaleManager.name(curse)} added to your deck!`
+                : `La figura ti maledice per la tua arroganza.\n${LocaleManager.name(curse)} aggiunta al mazzo!`;
             }
           }
         ]
@@ -1221,74 +1544,100 @@ export class MapScene extends Phaser.Scene {
       // 17. L'Altare del Sangue
       {
         title: "L'Altare del Sangue",
+        titleEn: 'The Blood Altar',
         text: 'Un altare antico e incrostato di sangue essiccato. Rune luminose promettono di potenziare le tue arti.',
+        textEn: 'An ancient altar encrusted with dried blood. Glowing runes promise to strengthen your arts.',
         choices: [
           {
             label: '🩸 Sacrifica 20 HP per upgradare una carta',
+            labelEn: '🩸 Sacrifice 20 HP to upgrade a card',
             condition: (r) => r.playerHp > 25 && (r.deckCards || []).some(c => !c.name.includes('✦') && !c.isCurse),
             effect: (r) => {
               r.playerHp -= 20;
               if (!r.deckCards) r.deckCards = [...STARTER_DECK];
               const upgradeable = r.deckCards.filter(c => !c.name.includes('✦') && !c.isCurse);
-              if (upgradeable.length === 0) return 'Nessuna carta da potenziare.\n(-20 HP)';
+              if (upgradeable.length === 0) return LocaleManager.isEn() ? 'No cards to upgrade.\n(-20 HP)' : 'Nessuna carta da potenziare.\n(-20 HP)';
               const card = upgradeable[Math.floor(Math.random() * upgradeable.length)];
               if (card.type === 'attack') {
                 card.value += 3;
                 card.name += ' \u2746';
                 card.description = card.description.replace(/(\d+) danni/, (m, n) => `${parseInt(n) + 3} danni`);
+                if (LocaleManager.isEn()) {
+                  card.descriptionEn = (card.descriptionEn || '').replace(/(\d+) damage/, (m, n) => `${parseInt(n) + 3} damage`);
+                }
               } else if (card.type === 'defend') {
                 card.value += 3;
                 card.name += ' \u2746';
                 card.description = card.description.replace(/(\d+) blocco/, (m, n) => `${parseInt(n) + 3} blocco`);
+                if (LocaleManager.isEn()) {
+                  card.descriptionEn = (card.descriptionEn || '').replace(/(\d+) block/, (m, n) => `${parseInt(n) + 3} block`);
+                }
               } else if (card.type === 'skill') {
                 if (card.extraStrength !== undefined) {
                   card.extraStrength += 2;
                   card.description = card.description.replace(/\+(\d+) forza/, (m, n) => `+${parseInt(n) + 2} forza`);
+                  if (LocaleManager.isEn()) {
+                    card.descriptionEn = (card.descriptionEn || '').replace(/\+(\d+) strength/, (m, n) => `+${parseInt(n) + 2} strength`);
+                  }
                 } else {
                   card.drawCards = (card.drawCards || 0) + 1;
                   if (!card.description.includes('Pesca')) card.description += '\nPesca 1 carta.';
+                  if (LocaleManager.isEn()) {
+                    card.descriptionEn = (card.descriptionEn || '').replace(/Draw (\d+) card/, (m, n) => `Draw ${parseInt(n) + 1} card`);
+                    if (!(card.descriptionEn || '').includes('Draw')) {
+                      card.descriptionEn = (card.descriptionEn || '') + '\nDraw 1 card.';
+                    }
+                  }
                 }
                 card.name += ' \u2746';
               }
-              return `L'altare ha potenziato: ${card.name}\n(-20 HP)`;
+              return LocaleManager.isEn()
+                ? `The altar upgraded: ${LocaleManager.name(card)}\n(-20 HP)`
+                : `L'altare ha potenziato: ${LocaleManager.name(card)}\n(-20 HP)`;
             }
           },
-          { label: '🚶 Passa oltre', effect: () => "L'altare si spegne mentre ti allontani." }
+          { label: '🚶 Passa oltre', labelEn: '🚶 Walk past', effect: () => LocaleManager.isEn() ? 'The altar dims as you walk away.' : "L'altare si spegne mentre ti allontani." }
         ]
       },
 
       // --- EVENTI CON FLAG (appaiono solo se la condizione è vera) ---
       {
         title: 'Il Mercante Riconosce il Tuo Volto',
+        titleEn: 'The Merchant Recognizes You',
         text: 'Il mercante ambulante ti sorride. "Ti ricordo! Prendi qualcosa a metà prezzo."',
+        textEn: 'The wandering merchant smiles. "I remember you! Take something at half price."',
         flagRequired: (r) => r.flags && r.flags.helpedMerchant,
         choices: [
           {
             label: 'Acquista pozione (25 oro)',
+            labelEn: 'Buy potion (25 gold)',
             condition: (r) => r.gold >= 25 && (r.potions || []).length < 3,
             effect: (r) => {
               r.gold -= 25;
               if (!r.potions) r.potions = [];
-              r.potions.push({ name: 'Pozione Salute', emoji: '🧴', effect: { heal: 30 }, price: 50 });
-              return 'Hai acquistato una pozione a metà prezzo!';
+              r.potions.push({ name: 'Pozione Salute', nameEn: 'Health Potion', emoji: '🧴', effect: { heal: 30 }, price: 50 });
+              return LocaleManager.isEn() ? 'You bought a potion at half price!' : 'Hai acquistato una pozione a metà prezzo!';
             }
           },
-          { label: 'Salutalo e vai', effect: (r) => 'Continui il tuo cammino.' }
+          { label: 'Salutalo e vai', labelEn: 'Greet and go', effect: (r) => LocaleManager.isEn() ? 'You continue on your way.' : 'Continui il tuo cammino.' }
         ]
       },
       {
         title: 'Lo Spirito Ricorda il Tuo Dono',
+        titleEn: 'The Spirit Remembers Your Gift',
         text: 'Lo spirito della foresta appare di nuovo. La sua luce è più intensa.',
+        textEn: 'The forest spirit appears again. Its light is brighter.',
         flagRequired: (r) => r.flags && r.flags.helpedSpirit,
         choices: [
           {
             label: 'Chiedi guarigione',
+            labelEn: 'Ask for healing',
             effect: (r) => {
               r.playerHp = Math.min(r.maxHp, r.playerHp + 25);
-              return '+25 HP dallo spirito riconoscente.';
+              return LocaleManager.isEn() ? '+25 HP from the grateful spirit.' : '+25 HP dallo spirito riconoscente.';
             }
           },
-          { label: 'Ringrazia e vai', effect: (r) => 'Lo spirito annuisce con gratitudine.' }
+          { label: 'Ringrazia e vai', labelEn: 'Thank and leave', effect: (r) => LocaleManager.isEn() ? 'The spirit nods with gratitude.' : 'Lo spirito annuisce con gratitudine.' }
         ]
       },
     ];
@@ -1310,12 +1659,14 @@ export class MapScene extends Phaser.Scene {
       .setStrokeStyle(2, 0xb07be8).setDepth(201));
 
     // Titolo
-    G(this.add.text(width / 2, height / 2 - panelH / 2 + 30, event.title, {
+    const _evTitle = LocaleManager.isEn() ? (event.titleEn || event.title) : event.title;
+    G(this.add.text(width / 2, height / 2 - panelH / 2 + 30, _evTitle, {
       fontFamily: FONT_TITLE, fontSize: '20px', color: '#b07be8', fontStyle: '700'
     }).setOrigin(0.5).setDepth(202));
 
     // Testo
-    G(this.add.text(width / 2, height / 2 - panelH / 2 + 65, event.text, {
+    const _evText = LocaleManager.isEn() ? (event.textEn || event.text) : event.text;
+    G(this.add.text(width / 2, height / 2 - panelH / 2 + 65, _evText, {
       fontFamily: F, fontSize: '12px', color: '#a08060', align: 'center', wordWrap: { width: 500 }
     }).setOrigin(0.5).setDepth(202));
 
@@ -1329,7 +1680,8 @@ export class MapScene extends Phaser.Scene {
         canSelect ? 0x4a2e10 : 0x2a1a08)
         .setStrokeStyle(2, canSelect ? 0xb07be8 : 0x3a1e08).setDepth(202));
 
-      G(this.add.text(width / 2, btnY, choice.label, {
+      const _choiceLabel = LocaleManager.isEn() ? (choice.labelEn || choice.label) : choice.label;
+      G(this.add.text(width / 2, btnY, _choiceLabel, {
         fontFamily: F, fontSize: '13px', color: canSelect ? '#f4e4c8' : '#c8a870', fontStyle: '700'
       }).setOrigin(0.5).setDepth(203));
 
@@ -1371,7 +1723,7 @@ export class MapScene extends Phaser.Scene {
     const overlay = this.add.rectangle(width / 2, height / 2, 440, 220, C.bgPanel, 0.98)
       .setStrokeStyle(2, 0xb07be8).setDepth(210).setInteractive();
 
-    this.add.text(width / 2, height / 2 - 45, 'Risultato', {
+    this.add.text(width / 2, height / 2 - 45, this._t('eventResult'), {
       fontFamily: F, fontSize: '16px', color: '#b07be8', fontStyle: '700'
     }).setOrigin(0.5).setDepth(211);
 
@@ -1380,7 +1732,7 @@ export class MapScene extends Phaser.Scene {
       align: 'center', wordWrap: { width: 400 }
     }).setOrigin(0.5).setDepth(211);
 
-    this.add.text(width / 2, height / 2 + 70, 'Clicca per continuare', {
+    this.add.text(width / 2, height / 2 + 70, this._t('eventClick'), {
       fontFamily: F, fontSize: '11px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(211);
 
@@ -1407,7 +1759,7 @@ export class MapScene extends Phaser.Scene {
 
     const typeColors   = { attack: 0x4a2a10, defend: 0x1a1a2a, skill: 0x1a3a1a, curse: 0x1a0a1e };
     const borderColors = { attack: 0xe85d5d, defend: 0x5b9bd5, skill: 0x5dc77a, curse: 0x8833aa };
-    const sortLabels   = ['Tipo+Costo ↑', 'Costo ↑', 'Costo ↓'];
+    const sortLabels   = [this._t('deckSortTypeCostAsc'), this._t('deckSortCostAsc'), this._t('deckSortCostDesc')];
 
     // ----- Helper: ordina e filtra -----
     const getFiltered = () => {
@@ -1429,22 +1781,22 @@ export class MapScene extends Phaser.Scene {
 
     // ----- Titolo -----
     const titleY = 28;
-    const titleText = G(this.add.text(width / 2, titleY, `MAZZO`, {
+    const titleText = G(this.add.text(width / 2, titleY, this._t('deckTitle'), {
       fontFamily: F, fontSize: '18px', color: '#f4e4c8', fontStyle: '700'
     }).setOrigin(0.5).setDepth(201));
 
     // ----- Contatore carte -----
-    const counterText = G(this.add.text(width / 2, 50, `${allCards.length} carte`, {
+    const counterText = G(this.add.text(width / 2, 50, `${allCards.length} ${this._t('deckCards')}`, {
       fontFamily: F, fontSize: '12px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(201));
 
     // ----- Filtri per tipo -----
     const filterBtns = {};
     const filterDefs = [
-      { key: 'all',    label: 'Tutti' },
-      { key: 'attack', label: '⚔️ Attacco' },
-      { key: 'defend', label: '🛡️ Difesa' },
-      { key: 'skill',  label: '✨ Abilità' },
+      { key: 'all',    label: this._t('deckFilterAll') },
+      { key: 'attack', label: this._t('deckFilterAttack') },
+      { key: 'defend', label: this._t('deckFilterDefend') },
+      { key: 'skill',  label: this._t('deckFilterSkill') },
     ];
     const filterBarY = 72;
     const filterBtnW = 110;
@@ -1513,10 +1865,12 @@ export class MapScene extends Phaser.Scene {
       // Aggiorna contatore
       const total = allCards.length;
       const shown = cards.length;
-      counterText.setText(shown === total ? `${total} carte` : `${shown} / ${total} carte`);
+      counterText.setText(shown === total
+        ? `${total} ${this._t('deckCards')}`
+        : `${shown} ${this._t('deckShownOf')} ${total} ${this._t('deckCards')}`);
 
       if (cards.length === 0) {
-        const noCards = this.add.text(width / 2, height / 2, 'Nessuna carta per questo filtro', {
+        const noCards = this.add.text(width / 2, height / 2, this._t('deckNoCards'), {
           fontFamily: F, fontSize: '13px', color: '#c8a870'
         }).setOrigin(0.5).setDepth(201);
         cardGroup.add(noCards);
@@ -1543,12 +1897,12 @@ export class MapScene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(202);
         cardGroup.add(costT);
 
-        const nameT = this.add.text(x + 8, y - 9, card.name, {
+        const nameT = this.add.text(x + 8, y - 9, LocaleManager.name(card), {
           fontFamily: F, fontSize: '11px', color: card.isCurse ? '#cc88ff' : '#f4e4c8', fontStyle: '700'
         }).setOrigin(0.5).setDepth(202);
         cardGroup.add(nameT);
 
-        const descT = this.add.text(x + 8, y + 10, card.description.replace(/\n/g, ' '), {
+        const descT = this.add.text(x + 8, y + 10, LocaleManager.desc(card).replace(/\n/g, ' '), {
           fontFamily: F, fontSize: '9px', color: '#a08060'
         }).setOrigin(0.5).setDepth(202);
         cardGroup.add(descT);
@@ -1569,7 +1923,7 @@ export class MapScene extends Phaser.Scene {
     // ----- Bottone CHIUDI -----
     const closeBtn = G(this.add.rectangle(width / 2, height - 40, 140, 36, 0x4a1a08)
       .setStrokeStyle(2, 0xe85d5d).setInteractive({ useHandCursor: true }).setDepth(201));
-    G(this.add.text(width / 2, height - 40, 'CHIUDI', {
+    G(this.add.text(width / 2, height - 40, this._t('deckClose'), {
       fontFamily: F, fontSize: '13px', color: '#e2e2e6', fontStyle: '700'
     }).setOrigin(0.5).setDepth(202));
 
@@ -1594,11 +1948,11 @@ export class MapScene extends Phaser.Scene {
 
     this.add.rectangle(width / 2, 0, width, 80, 0x3a1e08).setOrigin(0.5, 0).setDepth(201);
     this.add.rectangle(width / 2, 80, width, 1, 0x3a1e08, 0.6).setOrigin(0.5, 0).setDepth(201);
-    this.add.text(width / 2, 25, 'NEGOZIO', {
+    this.add.text(width / 2, 25, this._t('shopTitle'), {
       fontFamily: F, fontSize: '20px', color: '#d4a820', fontStyle: '700', letterSpacing: 3
     }).setOrigin(0.5).setDepth(202);
 
-    this.shopGoldText = this.add.text(width / 2, 55, `${this.runData.gold} oro disponibili`, {
+    this.shopGoldText = this.add.text(width / 2, 55, `${this.runData.gold} ${this._t('shopGoldAvail')}`, {
       fontFamily: F, fontSize: '13px', color: '#a08060'
     }).setOrigin(0.5).setDepth(202);
 
@@ -1618,7 +1972,7 @@ export class MapScene extends Phaser.Scene {
     });
 
     const rarityColors = { common: 0x8c8c96, uncommon: 0x5b9bd5, rare: 0xe8b84b };
-    const rarityLabels = { common: 'COMUNE', uncommon: 'NON COMUNE', rare: 'RARA' };
+    const rarityLabels = { common: this._t('shopRarityCommon'), uncommon: this._t('shopRarityUncommon'), rare: this._t('shopRarityRare') };
 
     const cardWidth = 160;
     const spacing = 180;
@@ -1646,7 +2000,7 @@ export class MapScene extends Phaser.Scene {
         fontFamily: F, fontSize: '13px', color: '#ffffff', fontStyle: '700'
       }).setOrigin(0.5).setDepth(203);
 
-      this.add.text(x, cardY - 35, card.name, {
+      this.add.text(x, cardY - 35, LocaleManager.name(card), {
         fontFamily: F, fontSize: '12px', color: '#1a0f00', fontStyle: '700'
       }).setOrigin(0.5).setDepth(202);
 
@@ -1655,12 +2009,12 @@ export class MapScene extends Phaser.Scene {
         fontFamily: F, fontSize: '20px', color: vc[card.type] || '#d4a820', fontStyle: '900'
       }).setOrigin(0.5).setDepth(202);
 
-      this.add.text(x, cardY + 30, card.description, {
+      this.add.text(x, cardY + 30, LocaleManager.desc(card), {
         fontFamily: F, fontSize: '9px', color: '#5a3a18', align: 'center', wordWrap: { width: 130 }
       }).setOrigin(0.5).setDepth(202);
 
       const priceColor = this.runData.gold >= card.price ? '#d4a820' : '#e85d5d';
-      const priceText = this.add.text(x, cardY + 80, `${card.price} oro`, {
+      const priceText = this.add.text(x, cardY + 80, `${card.price} ${this._t('goldWord')}`, {
         fontFamily: F, fontSize: '14px', color: priceColor, fontStyle: '700'
       }).setOrigin(0.5).setDepth(202);
 
@@ -1672,19 +2026,20 @@ export class MapScene extends Phaser.Scene {
           this.runData.gold -= card.price;
           if (!this.runData.deckCards) this.runData.deckCards = [...STARTER_DECK];
           this.runData.deckCards.push({
-            name: card.name, type: card.type, cost: card.cost,
+            name: card.name, nameEn: card.nameEn, type: card.type, cost: card.cost,
             value: card.value, description: card.description,
+            descriptionEn: card.descriptionEn, descEn: card.descEn,
             hits: card.hits, drawCards: card.drawCards,
             heal: card.heal, giveEnergy: card.giveEnergy,
             extraStrength: card.extraStrength,
             applyPoison: card.applyPoison, applyBurn: card.applyBurn, applyStun: card.applyStun,
           });
           SaveManager.trackCard(card.name);
-          priceText.setText('Comprata!');
+          priceText.setText(this._t('shopBought'));
           priceText.setColor('#5dc77a');
           cardBg.disableInteractive();
           cardBg.setAlpha(0.4);
-          this.shopGoldText.setText(`${this.runData.gold} oro disponibili`);
+          this.shopGoldText.setText(`${this.runData.gold} ${this._t('shopGoldAvail')}`);
           const unlockedDeck = AchievementManager.check({ type: 'deck_size', deckSize: this.runData.deckCards.length });
           this._showAchievementPopups(unlockedDeck);
           const unlockedGold = AchievementManager.check({ type: 'gold', gold: this.runData.gold });
@@ -1695,7 +2050,7 @@ export class MapScene extends Phaser.Scene {
 
     // Sezione Pozioni (2C)
     const potionY = height - 180;
-    this.add.text(width / 2, potionY - 15, '— POZIONI —', {
+    this.add.text(width / 2, potionY - 15, this._t('shopPotions'), {
       fontFamily: F, fontSize: '11px', color: '#c8a870', fontStyle: '700', letterSpacing: 2
     }).setOrigin(0.5).setDepth(202);
 
@@ -1709,11 +2064,11 @@ export class MapScene extends Phaser.Scene {
       if (canBuy) potionBg.setInteractive({ useHandCursor: true });
 
       this.add.text(px - 28, potionY + 25, potion.emoji, { fontSize: '18px' }).setOrigin(0.5).setDepth(202);
-      this.add.text(px + 16, potionY + 17, potion.name.replace('Pozione ', ''), {
+      this.add.text(px + 16, potionY + 17, LocaleManager.name(potion).replace(/^Pozione |^Potion /, ''), {
         fontFamily: F, fontSize: '10px', color: '#f4e4c8', fontStyle: '700'
       }).setOrigin(0.5).setDepth(202);
 
-      const potPriceText = this.add.text(px + 16, potionY + 33, `${potion.price} oro`, {
+      const potPriceText = this.add.text(px + 16, potionY + 33, `${potion.price} ${this._t('goldWord')}`, {
         fontFamily: F, fontSize: '10px', color: canBuy ? '#d4a820' : '#c8a870'
       }).setOrigin(0.5).setDepth(202);
 
@@ -1725,11 +2080,11 @@ export class MapScene extends Phaser.Scene {
             this.runData.gold -= potion.price;
             if (!this.runData.potions) this.runData.potions = [];
             this.runData.potions.push({ ...potion });
-            potPriceText.setText('Comprata!');
+            potPriceText.setText(this._t('shopBought'));
             potPriceText.setColor('#5dc77a');
             potionBg.disableInteractive();
             potionBg.setStrokeStyle(1.5, 0x4a2e10);
-            this.shopGoldText.setText(`${this.runData.gold} oro disponibili`);
+            this.shopGoldText.setText(`${this.runData.gold} ${this._t('shopGoldAvail')}`);
           }
         });
       }
@@ -1747,7 +2102,7 @@ export class MapScene extends Phaser.Scene {
       .setStrokeStyle(2, 0x6a1a1a).setDepth(200);
 
     // Titolo sezione
-    this.add.text(width / 2, removeSectionY - 22, '\uD83D\uDDD1\uFE0F RIMUOVI DAL MAZZO', {
+    this.add.text(width / 2, removeSectionY - 22, this._t('shopRemoveTitle'), {
       fontFamily: F, fontSize: '11px', color: '#aa3333', fontStyle: '700', letterSpacing: 2
     }).setOrigin(0.5).setDepth(202);
 
@@ -1755,16 +2110,16 @@ export class MapScene extends Phaser.Scene {
     let removeStatusMsg = '';
     let removeStatusColor = '#e85d5d';
     if (deckCards2.length <= 5) {
-      removeStatusMsg = 'Mazzo troppo piccolo (minimo 5 carte)';
+      removeStatusMsg = this._t('shopRemoveSmall');
       removeStatusColor = '#888898';
     } else if (removableCards.length === 0) {
-      removeStatusMsg = 'Nessuna carta rimovibile';
+      removeStatusMsg = this._t('shopRemoveNone');
       removeStatusColor = '#888898';
     } else if (this.runData.gold < removeCost) {
-      removeStatusMsg = `${removeCost} oro  (oro insufficiente)`;
+      removeStatusMsg = `${removeCost} ${this._t('shopRemovePoorGold')}`;
       removeStatusColor = '#e85d5d';
     } else {
-      removeStatusMsg = `${removeCost} oro  —  clicca una carta per rimuoverla`;
+      removeStatusMsg = `${removeCost} ${this._t('shopRemovePrompt')}`;
       removeStatusColor = '#c85050';
     }
 
@@ -1786,7 +2141,7 @@ export class MapScene extends Phaser.Scene {
           .setStrokeStyle(1, 0x8a2222)
           .setInteractive({ useHandCursor: true }).setDepth(202);
 
-        this.add.text(px, previewY, pc.name, {
+        this.add.text(px, previewY, LocaleManager.name(pc), {
           fontFamily: F, fontSize: '9px', color: '#f0c0c0', fontStyle: '700'
         }).setOrigin(0.5).setDepth(203);
 
@@ -1800,7 +2155,7 @@ export class MapScene extends Phaser.Scene {
       // Bottone fallback se nessuna carta da preview
       const removeBtn = this.add.rectangle(width / 2, removeSectionY + 12, 240, 28, 0x2a0808)
         .setStrokeStyle(1.5, 0x8a2222).setInteractive({ useHandCursor: true }).setDepth(202);
-      this.add.text(width / 2, removeSectionY + 12, 'Scegli carta da rimuovere', {
+      this.add.text(width / 2, removeSectionY + 12, this._t('shopChooseRemove'), {
         fontFamily: F, fontSize: '10px', color: '#c85050', fontStyle: '700'
       }).setOrigin(0.5).setDepth(203);
       removeBtn.on('pointerover', () => removeBtn.setFillStyle(0x4a1010));
@@ -1811,7 +2166,7 @@ export class MapScene extends Phaser.Scene {
     // Exit button
     const exitBtn = this.add.rectangle(width / 2, height - 50, 180, 36, 0x4a2e10)
       .setStrokeStyle(1.5, 0x3a1e08).setInteractive({ useHandCursor: true }).setDepth(201);
-    this.add.text(width / 2, height - 50, 'Esci dal negozio', {
+    this.add.text(width / 2, height - 50, this._t('shopExit'), {
       fontFamily: F, fontSize: '13px', color: '#a08060'
     }).setOrigin(0.5).setDepth(202);
 
@@ -1829,11 +2184,11 @@ export class MapScene extends Phaser.Scene {
     const overlay = this.add.rectangle(width / 2, height / 2, width, height, 0x2a1206, 0.98)
       .setDepth(300).setInteractive();
 
-    this.add.text(width / 2, 28, 'SCEGLI UNA CARTA DA RIMUOVERE', {
+    this.add.text(width / 2, 28, this._t('removeTitle'), {
       fontFamily: F, fontSize: '16px', color: '#e85d5d', fontStyle: '700', letterSpacing: 1
     }).setOrigin(0.5).setDepth(301);
 
-    this.add.text(width / 2, 52, 'Clicca su una carta per rimuoverla dal mazzo', {
+    this.add.text(width / 2, 52, this._t('removeSub'), {
       fontFamily: F, fontSize: '11px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(301);
 
@@ -1858,7 +2213,7 @@ export class MapScene extends Phaser.Scene {
       const iconKey = card.isCurse ? 'icon-curse' : `icon-${card.type}`;
       const iconImg = this.add.image(x - 50, y, iconKey).setScale(0.7).setDepth(302);
 
-      const nameT = this.add.text(x + 5, y - 10, card.name, {
+      const nameT = this.add.text(x + 5, y - 10, LocaleManager.name(card), {
         fontFamily: F, fontSize: '11px', color: '#f4e4c8', fontStyle: '700'
       }).setOrigin(0.5).setDepth(302);
 
@@ -1877,14 +2232,14 @@ export class MapScene extends Phaser.Scene {
         uiElements.forEach(el => el.destroy());
         cancelBtn.destroy();
         cancelText.destroy();
-        if (this.shopGoldText) this.shopGoldText.setText(`${this.runData.gold} oro disponibili`);
+        if (this.shopGoldText) this.shopGoldText.setText(`${this.runData.gold} ${this._t('shopGoldAvail')}`);
         if (onComplete) onComplete();
       });
     });
 
     const cancelBtn = this.add.rectangle(width / 2, height - 40, 160, 35, 0x4a2e10)
       .setStrokeStyle(1.5, 0x3a1e08).setInteractive({ useHandCursor: true }).setDepth(301);
-    const cancelText = this.add.text(width / 2, height - 40, 'Annulla', {
+    const cancelText = this.add.text(width / 2, height - 40, this._t('removeCancel'), {
       fontFamily: F, fontSize: '13px', color: '#a08060'
     }).setOrigin(0.5).setDepth(302);
 
@@ -1916,7 +2271,7 @@ export class MapScene extends Phaser.Scene {
     const undoBg = this.add.rectangle(undoBtnX, undoBtnY, 90, 20, C.bgPanelDark, 0.9)
       .setStrokeStyle(1.5, C.mana)
       .setInteractive({ useHandCursor: true }).setDepth(51);
-    const undoTxt = this.add.text(undoBtnX, undoBtnY, '↩ Annulla', {
+    const undoTxt = this.add.text(undoBtnX, undoBtnY, this._t('undoBtn'), {
       fontFamily: F, fontSize: '10px', color: '#4a90d9', fontStyle: '700'
     }).setOrigin(0.5).setDepth(52);
 
@@ -1940,7 +2295,7 @@ export class MapScene extends Phaser.Scene {
     const G = (obj) => { this.undoOverlayGroup.add(obj); return obj; };
 
     const lastNode = this.runData.lastNode;
-    const typeLabels = { shop: 'Negozio 🛒', event: 'Evento 🟣', rest: 'Riposo 🟢' };
+    const typeLabels = { shop: this._t('undoTypeShop'), event: this._t('undoTypeEvent'), rest: this._t('undoTypeRest') };
     const nodeLabel = typeLabels[lastNode.type] || lastNode.type;
 
     G(this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.65)
@@ -1949,21 +2304,21 @@ export class MapScene extends Phaser.Scene {
     G(this.add.rectangle(width / 2, height / 2, 440, 200, C.bgPanel)
       .setStrokeStyle(2, C.borderGold).setDepth(311));
 
-    G(this.add.text(width / 2, height / 2 - 70, '↩ Annulla ultima azione?', {
+    G(this.add.text(width / 2, height / 2 - 70, this._t('undoTitle'), {
       fontFamily: F, fontSize: '18px', color: '#e8b84b', fontStyle: '700'
     }).setOrigin(0.5).setDepth(312));
 
-    G(this.add.text(width / 2, height / 2 - 38, `Nodo da annullare: ${nodeLabel}`, {
+    G(this.add.text(width / 2, height / 2 - 38, `${this._t('undoNodeLabel')}${nodeLabel}`, {
       fontFamily: F, fontSize: '13px', color: '#c8a870'
     }).setOrigin(0.5).setDepth(312));
 
-    G(this.add.text(width / 2, height / 2 - 18, 'Tornerai alla posizione precedente sulla mappa.', {
+    G(this.add.text(width / 2, height / 2 - 18, this._t('undoDesc'), {
       fontFamily: F, fontSize: '11px', color: '#a08060', align: 'center', wordWrap: { width: 400 }
     }).setOrigin(0.5).setDepth(312));
 
     const confirmBtn = G(this.add.rectangle(width / 2 - 80, height / 2 + 50, 140, 38, 0x3a1010)
       .setStrokeStyle(2, 0xe85d5d).setInteractive({ useHandCursor: true }).setDepth(311));
-    G(this.add.text(width / 2 - 80, height / 2 + 50, 'CONFERMA', {
+    G(this.add.text(width / 2 - 80, height / 2 + 50, this._t('undoConfirm'), {
       fontFamily: F, fontSize: '13px', color: '#e85d5d', fontStyle: '700'
     }).setOrigin(0.5).setDepth(312));
 
@@ -1973,7 +2328,7 @@ export class MapScene extends Phaser.Scene {
 
     const cancelBtn = G(this.add.rectangle(width / 2 + 80, height / 2 + 50, 140, 38, 0x2a2a2a)
       .setStrokeStyle(2, 0x888898).setInteractive({ useHandCursor: true }).setDepth(311));
-    G(this.add.text(width / 2 + 80, height / 2 + 50, 'ANNULLA', {
+    G(this.add.text(width / 2 + 80, height / 2 + 50, this._t('undoCancel'), {
       fontFamily: F, fontSize: '13px', color: '#888898', fontStyle: '700'
     }).setOrigin(0.5).setDepth(312));
 
@@ -2041,26 +2396,26 @@ export class MapScene extends Phaser.Scene {
     G(this.add.rectangle(width / 2, height / 2, 520, 260, 0x1a1020)
       .setStrokeStyle(2.5, 0xe8b84b).setDepth(401));
 
-    G(this.add.text(width / 2, height / 2 - 95, '\uD83C\uDFC6 Boss in vista!', {
+    G(this.add.text(width / 2, height / 2 - 95, this._t('endlessBossTitle'), {
       fontFamily: F, fontSize: '22px', color: '#e8b84b', fontStyle: '700'
     }).setOrigin(0.5).setDepth(402));
 
-    G(this.add.text(width / 2, height / 2 - 58, 'Vuoi continuare la run dopo aver sconfitto il boss?', {
+    G(this.add.text(width / 2, height / 2 - 58, this._t('endlessBossDesc'), {
       fontFamily: F, fontSize: '12px', color: '#c8a870', align: 'center', wordWrap: { width: 460 }
     }).setOrigin(0.5).setDepth(402));
 
     const depth = (this.runData.endlessDepth || 0) + 1;
-    G(this.add.text(width / 2, height / 2 - 35, `Difficolt\u00E0 Endless: ${Math.min(10, depth * 2 + 1)}/10`, {
+    G(this.add.text(width / 2, height / 2 - 35, `${this._t('endlessDifficulty')}${Math.min(10, depth * 2 + 1)}/10`, {
       fontFamily: F, fontSize: '11px', color: '#a080c0'
     }).setOrigin(0.5).setDepth(402));
 
     // Bottone CONTINUA (Endless)
     const btnContinue = G(this.add.rectangle(width / 2 - 110, height / 2 + 35, 200, 54, 0x1a1a10)
       .setStrokeStyle(2, 0xe8b84b).setInteractive({ useHandCursor: true }).setDepth(401));
-    G(this.add.text(width / 2 - 110, height / 2 + 22, '\u267E CONTINUA', {
+    G(this.add.text(width / 2 - 110, height / 2 + 22, this._t('endlessContinueBtn'), {
       fontFamily: F, fontSize: '15px', color: '#e8b84b', fontStyle: '700'
     }).setOrigin(0.5).setDepth(402));
-    G(this.add.text(width / 2 - 110, height / 2 + 42, '(Endless Mode)', {
+    G(this.add.text(width / 2 - 110, height / 2 + 42, this._t('endlessContinueSub'), {
       fontFamily: F, fontSize: '10px', color: '#a08040'
     }).setOrigin(0.5).setDepth(402));
 
@@ -2075,10 +2430,10 @@ export class MapScene extends Phaser.Scene {
     // Bottone TERMINA LA RUN
     const btnEnd = G(this.add.rectangle(width / 2 + 110, height / 2 + 35, 200, 54, 0x100a0a)
       .setStrokeStyle(2, 0x888898).setInteractive({ useHandCursor: true }).setDepth(401));
-    G(this.add.text(width / 2 + 110, height / 2 + 22, 'TERMINA', {
+    G(this.add.text(width / 2 + 110, height / 2 + 22, this._t('endlessEndBtn'), {
       fontFamily: F, fontSize: '15px', color: '#888898', fontStyle: '700'
     }).setOrigin(0.5).setDepth(402));
-    G(this.add.text(width / 2 + 110, height / 2 + 42, 'la run dopo il boss', {
+    G(this.add.text(width / 2 + 110, height / 2 + 42, this._t('endlessEndSub'), {
       fontFamily: F, fontSize: '10px', color: '#666670'
     }).setOrigin(0.5).setDepth(402));
 
@@ -2188,21 +2543,21 @@ export class MapScene extends Phaser.Scene {
       {
         highlightX: width / 2, highlightY: 35,
         highlightW: width, highlightH: 70,
-        text: "Qui trovi i tuoi HP, oro e reliquie. Tienili d'occhio durante la run.",
+        text: this._t('tutStep1'),
       },
       {
         highlightX: width / 2, highlightY: height / 2,
         highlightW: width - 160, highlightH: height - 160,
-        text: "Clicca sui nodi raggiungibili (luminosi) per avanzare.\n\u2694\uFE0F combattimento  \uD83D\uDFE1 elite  \uD83D\uDFE3 evento  \uD83D\uDED2 shop  \uD83D\uDFE2 riposo  \uD83D\uDC80 boss",
+        text: this._t('tutStep2'),
       },
       {
         highlightX: width - 60, highlightY: 52,
         highlightW: 140, highlightH: 26,
-        text: 'Clicca MAZZO per vedere tutte le tue carte. Pi\u00F9 carte forti = pi\u00F9 chance di sopravvivere.',
+        text: this._t('tutStep3'),
       },
       {
         highlightX: null,
-        text: 'Sei pronto! Costruisci il tuo mazzo e sconfiggi il boss. Buona fortuna!',
+        text: this._t('tutStep4'),
         isFinal: true,
       },
     ];
@@ -2240,7 +2595,7 @@ export class MapScene extends Phaser.Scene {
       if (step.isFinal) {
         const startBtn = G(this.add.rectangle(width / 2, panelY + 30, 210, 32, 0x3a2a08)
           .setStrokeStyle(2, 0xe8b84b).setInteractive({ useHandCursor: true }).setDepth(302));
-        G(this.add.text(width / 2, panelY + 30, "INIZIA L'AVVENTURA", {
+        G(this.add.text(width / 2, panelY + 30, this._t('tutStart'), {
           fontFamily: F, fontSize: '12px', color: '#e8b84b', fontStyle: '700'
         }).setOrigin(0.5).setDepth(303));
 
@@ -2254,7 +2609,7 @@ export class MapScene extends Phaser.Scene {
       } else {
         const nextBtn = G(this.add.rectangle(width / 2 + 80, panelY + 30, 120, 28, 0x3a2a08)
           .setStrokeStyle(1.5, 0xe8b84b).setInteractive({ useHandCursor: true }).setDepth(302));
-        G(this.add.text(width / 2 + 80, panelY + 30, 'AVANTI \u2192', {
+        G(this.add.text(width / 2 + 80, panelY + 30, this._t('tutNext'), {
           fontFamily: F, fontSize: '11px', color: '#e8b84b', fontStyle: '700'
         }).setOrigin(0.5).setDepth(303));
 
@@ -2267,7 +2622,7 @@ export class MapScene extends Phaser.Scene {
 
         const skipBtn = G(this.add.rectangle(width / 2 - 80, panelY + 30, 100, 28, 0x1e1e28)
           .setStrokeStyle(1.5, 0x555560).setInteractive({ useHandCursor: true }).setDepth(302));
-        G(this.add.text(width / 2 - 80, panelY + 30, 'SALTA', {
+        G(this.add.text(width / 2 - 80, panelY + 30, this._t('tutSkip'), {
           fontFamily: F, fontSize: '11px', color: '#888898'
         }).setOrigin(0.5).setDepth(303));
 

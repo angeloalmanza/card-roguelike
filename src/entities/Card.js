@@ -6,10 +6,12 @@ export class Card {
   constructor(data) {
     this.id = data.id;
     this.name = data.name;
+    this.nameEn = data.nameEn || '';
     this.type = data.type;
     this.cost = data.cost;
     this.value = data.value;
     this.description = data.description;
+    this.descriptionEn = data.descriptionEn || '';
     this.isCurse = data.isCurse || false;
     // Effetti speciali
     this.hits = data.hits || 0;

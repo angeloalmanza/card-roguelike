@@ -15,8 +15,245 @@ import { PerkManager } from '../managers/PerkManager.js';
 import { AscensionManager } from '../managers/AscensionManager.js';
 import { CLASSES } from '../data/classes.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider, CARD_COLORS } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
 
 const F = FONT_BODY;
+
+// ── Translations ──────────────────────────────────────────────────────────────
+const T = {
+  it: {
+    // Top bar
+    energia:          'ENERGIA',
+    mazzo:            'MAZZO',
+    scarti:           'SCARTI',
+    turno:            'Turno',
+    fineTurno:        'FINE TURNO',
+    spazio:           '[SPAZIO]',
+    // Pile overlay
+    mazzoPesca:       'Mazzo di Pesca',
+    pilaScartati:     'Pila degli Scarti',
+    nessunaCarta:     'Nessuna carta',
+    chiudi:           'CHIUDI',
+    carte:            'carte',
+    // Legend overlay
+    guidaEffetti:     'Guida agli Effetti',
+    atkDesc:          'ATK  Attacco',
+    atkBody:          'Infligge danni al nemico. Trascina sulla zona nemico.',
+    defDesc:          'DEF  Difesa / Blocco',
+    defBody:          'Riduce i danni subiti questo turno. Si azzera ad ogni turno.',
+    strDesc:          'STR  Forza',
+    strBody:          'Ogni punto di forza aggiunge +1 danno ad ogni attacco.',
+    enDesc:           'EN   Energia',
+    enBody:           'Serve per giocare le carte. Si ripristina ad ogni turno.',
+    slancioDesc:      '⚡ Slancio',
+    slancioBody:      'Ogni carta attacco giocata di fila aumenta lo Slancio. Il danno dell\'attacco successivo viene moltiplicato per lo Slancio. Si azzera se giochi una carta non-attacco.',
+    caricaDesc:       '💥 Carica',
+    caricaBody:       'Alcune carte accumlano punti Carica. Clicca il badge CARICA per attivarlo: il prossimo attacco infligge +5 danni per ogni punto accumulato.',
+    velenoDesc:       '☠ Veleno',
+    velenoBody:       'Infligge N danni a fine turno al nemico, poi si riduce di 1.',
+    bruciDesc:        '🔥 Bruciatura',
+    bruciBody:        'Infligge N danni fissi a fine turno al nemico, poi si azzera.',
+    stordDesc:        '💫 Stordimento',
+    stordBody:        'Il nemico salta il prossimo turno.',
+    malDesc:          '☠  Maledizione',
+    malBody:          'Carta negativa nel mazzo. Ha effetti dannosi quando giocata.',
+    pescaDesc:        'Pesca carte',
+    pescaBody:        'Pesca carte extra dal mazzo di pesca nella mano.',
+    colpiDesc:        'Colpi multipli',
+    colpiBody:        'La carta colpisce più volte. Il blocco nemico riduce ogni colpo.',
+    relicDesc:        'Reliquie',
+    relicBody:        'Bonus passivi raccolti da elite e boss. Visibili in alto a destra.',
+    // Pause menu
+    inPausa:          'IN PAUSA',
+    riprendi:         '▶ RIPRENDI',
+    impostazioni:     '⚙ IMPOSTAZIONI',
+    abbandonaRun:     '✕ ABBANDONA RUN',
+    pausaBadge:       '⏸ PAUSA',
+    // Abandon confirm
+    abbandonareTitolo: 'Abbandonare la run?',
+    abbandonareSub:   'I progressi andranno persi.',
+    si:               'SÌ',
+    no:               'NO',
+    // Victory / Defeat
+    vittoria:         'VITTORIA!',
+    sconfitta:        'SCONFITTA',
+    sconfittoLabel:   'SCONFITTO!',
+    clickContinua:    'Clicca per continuare',
+    clickRicomincia:  'Clicca per ricominciare',
+    runFinita:        'La tua run è finita.',
+    // Intent
+    stordito:         '💫 STORDITO',
+    difende:          (name, val) => `${name} si difende! +${val} blocco`,
+    siCura:           (name, val) => `${name} si cura! +${val} HP`,
+    eStordito:        (name) => `${name} è stordito! Salta il turno.`,
+    danniBloccati:    (val) => `${val} danni bloccati!`,
+    indebolito:       (name) => `${name} è indebolito! -30% danni.`,
+    defIntent:        (val) => `DEF  +${val} blocco`,
+    healIntent:       (val) => `💚 Cura +${val}`,
+    statoIntent:      'Stato',
+    // Card messages
+    energiaInsufficiente: 'Energia insufficiente!',
+    abilitaUsata:     'Abilità già usata!',
+    // Status messages
+    slancioTooltip:   '⚡ Attacchi consecutivi moltiplicano il danno.\nSi azzera giocando carte non-attacco.',
+    caricaTooltip:    '💥 Clicca per attivare: il prossimo attacco\ninfligge +5 danni per ogni punto accumulato.',
+    slancioLabel:     'SLANCIO',
+    caricaLabel:      'CARICA',
+    // Class ability
+    abilitaGiaUsata:  '✓ USATA',
+    // showCardEffect
+    blocco:           'Blocco',
+    forza:            'Forza',
+    forzaTurno:       (val) => `+${val} Forza (turno)`,
+    forzaPerm:        (val) => `+${val} Forza`,
+    maledizione:      '☠ Maledizione!',
+    scartaCarta:      (n) => `Scarta ${n} carta!`,
+    nemicoBlocko:     (n) => `Nemico +${n} blocco`,
+    // Piano
+    pianoLabel:       (n) => `Piano ${n}`,
+    // Achievement
+    achievementLabel: '🏆 Achievement sbloccato!',
+    // relicTooltip actions
+    relicClicca:      '[Clicca per attivare]',
+    relicUsata:       '[Già usata]',
+    stackInfo:        (n) => `\nStack: ${n}`,
+    // useClassAbility messages
+    gridoDiGuerra:    '⚔️ Grido di Guerra! +10 Blocco, +2 Forza',
+    ombra:            '🗡️ Ombra! Pescate 3 carte.',
+    fialaTossica:     '⚗️ Fiala Tossica! +8 Veleno al nemico.',
+    // relic ability
+    relicGiaUsata:    (name) => `${name} già usata!`,
+    relicMsg:         (name, msgs) => `${name}: ${msgs}`,
+    // Victory gold
+    oro:              'oro',
+    // enemy turn messages
+    danniRitorno:     (n) => `${n} danni di ritorno!`,
+    // status inline
+    veleno:           'Veleno',
+    bruciatura:       'Bruciatura',
+    stordimento:      'Stordito!',
+    debolezza:        'Deb',
+    danni:            'danni',
+    carte:            'carte',
+    piano:            'piano',
+  },
+  en: {
+    // Top bar
+    energia:          'ENERGY',
+    mazzo:            'DECK',
+    scarti:           'DISCARD',
+    turno:            'Turn',
+    fineTurno:        'END TURN',
+    spazio:           '[SPACE]',
+    // Pile overlay
+    mazzoPesca:       'Draw Pile',
+    pilaScartati:     'Discard Pile',
+    nessunaCarta:     'No cards',
+    chiudi:           'CLOSE',
+    carte:            'cards',
+    // Legend overlay
+    guidaEffetti:     'Effects Guide',
+    atkDesc:          'ATK  Attack',
+    atkBody:          'Deals damage to the enemy. Drag onto the enemy zone.',
+    defDesc:          'DEF  Defense / Block',
+    defBody:          'Reduces damage taken this turn. Resets each turn.',
+    strDesc:          'STR  Strength',
+    strBody:          'Each Strength point adds +1 damage to every attack.',
+    enDesc:           'EN   Energy',
+    enBody:           'Used to play cards. Restored at the start of each turn.',
+    slancioDesc:      '⚡ Momentum',
+    slancioBody:      'Each consecutive attack card played increases Momentum. The next attack\'s damage is multiplied by Momentum. Resets if you play a non-attack card.',
+    caricaDesc:       '💥 Charge',
+    caricaBody:       'Some cards accumulate Charge points. Click the CHARGE badge to activate it: the next attack deals +5 damage per accumulated point.',
+    velenoDesc:       '☠ Poison',
+    velenoBody:       'Deals N damage at end of turn to the enemy, then decreases by 1.',
+    bruciDesc:        '🔥 Burn',
+    bruciBody:        'Deals N fixed damage at end of turn to the enemy, then clears.',
+    stordDesc:        '💫 Stun',
+    stordBody:        'The enemy skips their next turn.',
+    malDesc:          '☠  Curse',
+    malBody:          'A negative card in your deck. Has harmful effects when played.',
+    pescaDesc:        'Draw cards',
+    pescaBody:        'Draw extra cards from the draw pile into your hand.',
+    colpiDesc:        'Multiple hits',
+    colpiBody:        'The card hits multiple times. Enemy block reduces each hit.',
+    relicDesc:        'Relics',
+    relicBody:        'Passive bonuses collected from elites and bosses. Visible top-right.',
+    // Pause menu
+    inPausa:          'PAUSED',
+    riprendi:         '▶ RESUME',
+    impostazioni:     '⚙ SETTINGS',
+    abbandonaRun:     '✕ ABANDON RUN',
+    pausaBadge:       '⏸ PAUSE',
+    // Abandon confirm
+    abbandonareTitolo: 'Abandon the run?',
+    abbandonareSub:   'Your progress will be lost.',
+    si:               'YES',
+    no:               'NO',
+    // Victory / Defeat
+    vittoria:         'VICTORY!',
+    sconfitta:        'DEFEAT',
+    sconfittoLabel:   'DEFEATED!',
+    clickContinua:    'Click to continue',
+    clickRicomincia:  'Click to restart',
+    runFinita:        'Your run is over.',
+    // Intent
+    stordito:         '💫 STUNNED',
+    difende:          (name, val) => `${name} defends! +${val} block`,
+    siCura:           (name, val) => `${name} heals! +${val} HP`,
+    eStordito:        (name) => `${name} is stunned! Skips turn.`,
+    danniBloccati:    (val) => `${val} damage blocked!`,
+    indebolito:       (name) => `${name} is weakened! -30% damage.`,
+    defIntent:        (val) => `DEF  +${val} block`,
+    healIntent:       (val) => `💚 Heal +${val}`,
+    statoIntent:      'Status',
+    // Card messages
+    energiaInsufficiente: 'Not enough energy!',
+    abilitaUsata:     'Ability already used!',
+    // Status messages
+    slancioTooltip:   '⚡ Consecutive attacks multiply damage.\nResets when you play a non-attack card.',
+    caricaTooltip:    '💥 Click to activate: next attack\ndeals +5 damage per accumulated point.',
+    slancioLabel:     'MOMENTUM',
+    caricaLabel:      'CHARGE',
+    // Class ability
+    abilitaGiaUsata:  '✓ USED',
+    // showCardEffect
+    blocco:           'Block',
+    forza:            'Strength',
+    forzaTurno:       (val) => `+${val} Strength (turn)`,
+    forzaPerm:        (val) => `+${val} Strength`,
+    maledizione:      '☠ Curse!',
+    scartaCarta:      (n) => `Discard ${n} card!`,
+    nemicoBlocko:     (n) => `Enemy +${n} block`,
+    // Piano
+    pianoLabel:       (n) => `Floor ${n}`,
+    // Achievement
+    achievementLabel: '🏆 Achievement unlocked!',
+    // relicTooltip actions
+    relicClicca:      '[Click to activate]',
+    relicUsata:       '[Already used]',
+    stackInfo:        (n) => `\nStack: ${n}`,
+    // useClassAbility messages
+    gridoDiGuerra:    '⚔️ War Cry! +10 Block, +2 Strength',
+    ombra:            '🗡️ Shadow! Draw 3 cards.',
+    fialaTossica:     '⚗️ Toxic Vial! +8 Poison to enemy.',
+    // relic ability
+    relicGiaUsata:    (name) => `${name} already used!`,
+    relicMsg:         (name, msgs) => `${name}: ${msgs}`,
+    // Victory gold
+    oro:              'gold',
+    // enemy turn messages
+    danniRitorno:     (n) => `${n} return damage!`,
+    // status inline
+    veleno:           'Poison',
+    bruciatura:       'Burn',
+    stordimento:      'Stunned!',
+    debolezza:        'Wk',
+    danni:            'damage',
+    carte:            'cards',
+    piano:            'floor',
+  },
+};
 
 /**
  * CombatScene — Layout moderno.
@@ -42,6 +279,11 @@ export class CombatScene extends Phaser.Scene {
     const { width, height } = this.scale;
     this.isAnimating = false;
     this.cameras.main.fadeIn(400, 0, 0, 0);
+
+    // ── i18n ────────────────────────────────────────────────────────────────
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
+    this._t = t;
 
     MusicManager.start(this, 0.12);
     MusicManager.setVolume(this, 0.12);
@@ -283,7 +525,7 @@ export class CombatScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(72).setVisible(false); // manteniamo per compatibilità
 
     // Label ENERGIA
-    this.add.text(this._energyDotsX, barY + 18, 'ENERGIA', {
+    this.add.text(this._energyDotsX, barY + 18, this._t('energia'), {
       fontFamily: FONT_UI, fontSize: '7px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
       fontStyle: '700', letterSpacing: 1
@@ -308,7 +550,7 @@ export class CombatScene extends Phaser.Scene {
       color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
       fontStyle: '700'
     }).setOrigin(0, 0.5).setDepth(72);
-    this.add.text(110, barY + 14, 'MAZZO', {
+    this.add.text(110, barY + 14, this._t('mazzo'), {
       fontFamily: FONT_UI, fontSize: '7px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
       fontStyle: '700', letterSpacing: 1
@@ -316,7 +558,7 @@ export class CombatScene extends Phaser.Scene {
 
     drawPileBg.on('pointerover', () => drawPileBg.setStrokeStyle(1, C.borderGold));
     drawPileBg.on('pointerout',  () => drawPileBg.setStrokeStyle(1, C.borderGoldDim));
-    drawPileBg.on('pointerdown', () => this.showPileOverlay('Mazzo di Pesca', this.deck.drawPile));
+    drawPileBg.on('pointerdown', () => this.showPileOverlay(this._t('mazzoPesca'), this.deck.drawPile));
 
     // ── Pila scarti ───────────────────────────────────────────────────────
     const discardPileBg = this.add.rectangle(175, barY, 54, 32, C.bgPanel)
@@ -329,7 +571,7 @@ export class CombatScene extends Phaser.Scene {
       color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
       fontStyle: '700'
     }).setOrigin(0, 0.5).setDepth(72);
-    this.add.text(175, barY + 14, 'SCARTI', {
+    this.add.text(175, barY + 14, this._t('scarti'), {
       fontFamily: FONT_UI, fontSize: '7px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
       fontStyle: '700', letterSpacing: 1
@@ -337,7 +579,7 @@ export class CombatScene extends Phaser.Scene {
 
     discardPileBg.on('pointerover', () => discardPileBg.setStrokeStyle(1, C.borderGold));
     discardPileBg.on('pointerout',  () => discardPileBg.setStrokeStyle(1, C.borderGoldDim));
-    discardPileBg.on('pointerdown', () => this.showPileOverlay('Pila degli Scarti', this.deck.discardPile));
+    discardPileBg.on('pointerdown', () => this.showPileOverlay(this._t('pilaScartati'), this.deck.discardPile));
 
     // ── Guida ─────────────────────────────────────────────────────────────
     const legendBg = this.add.rectangle(240, barY, 32, 32, C.bgPanel)
@@ -354,7 +596,7 @@ export class CombatScene extends Phaser.Scene {
     legendBg.on('pointerdown', () => this.showLegendOverlay());
 
     // ── Turno (centrato) ──────────────────────────────────────────────────
-    this.turnText = this.add.text(width / 2, barY, 'Turno 1', {
+    this.turnText = this.add.text(width / 2, barY, `${this._t('turno')} 1`, {
       fontFamily: FONT_UI, fontSize: '13px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       letterSpacing: 2
@@ -362,7 +604,7 @@ export class CombatScene extends Phaser.Scene {
 
     // ── Fine turno — createButton ─────────────────────────────────────────
     const { bg: etBg, txt: etTxt } = createButton(
-      this, width - 80, barY, 120, 34, 'FINE TURNO',
+      this, width - 80, barY, 120, 34, this._t('fineTurno'),
       {
         fill: C.btnPrimary,
         hover: C.btnHover,
@@ -382,7 +624,7 @@ export class CombatScene extends Phaser.Scene {
     this.endTurnBtn._fill = C.btnPrimary;
 
     // Hint tastiera [SPAZIO]
-    this.add.text(width - 80, barY + 22, '[SPAZIO]', {
+    this.add.text(width - 80, barY + 22, this._t('spazio'), {
       fontFamily: FONT_UI, fontSize: '9px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
     }).setOrigin(0.5).setDepth(70);
@@ -422,7 +664,7 @@ export class CombatScene extends Phaser.Scene {
 
       bg.on('pointerover', () => {
         bg.setStrokeStyle(1.5, C.borderGold);
-        this.showMessage(potion.name, '#5b9bd5');
+        this.showMessage(LocaleManager.name(potion), '#5b9bd5');
       });
       bg.on('pointerout', () => bg.setStrokeStyle(1.5, C.mana));
       bg.on('pointerdown', () => {
@@ -442,15 +684,15 @@ export class CombatScene extends Phaser.Scene {
     }
     if (effect.block) {
       this.player.addBlock(effect.block);
-      msgs.push(`+${effect.block} Blocco`);
+      msgs.push(`+${effect.block} ${this._t('blocco')}`);
     }
     if (effect.strength) {
       this.player.strength += effect.strength;
-      msgs.push(`+${effect.strength} Forza`);
+      msgs.push(`+${effect.strength} ${this._t('forza')}`);
     }
     if (effect.energy) {
       this.player.energy += effect.energy;
-      msgs.push(`+${effect.energy} Energia`);
+      msgs.push(`+${effect.energy} ${this._t('energia')}`);
     }
 
     if (msgs.length > 0) this.showMessage(msgs.join('  '), '#5b9bd5');
@@ -505,10 +747,10 @@ export class CombatScene extends Phaser.Scene {
           this.relicTooltip?.destroy();
           this.relicTooltipBg?.destroy();
           const charged = this.relicManager.isRelicCharged(relic.id);
-          const extra = charged ? '\n[Clicca per attivare]' : '\n[Già usata]';
+          const extra = charged ? `\n${this._t('relicClicca')}` : `\n${this._t('relicUsata')}`;
           this.relicTooltipBg = this.add.rectangle(x - 65, y + 34, 190, 56, C.bgPanel, 0.97)
             .setStrokeStyle(1, C.borderGold).setDepth(150);
-          this.relicTooltip = this.add.text(x - 65, y + 34, `${relic.name}\n${relic.description}${extra}`, {
+          this.relicTooltip = this.add.text(x - 65, y + 34, `${LocaleManager.name(relic)}\n${LocaleManager.desc(relic)}${extra}`, {
             fontFamily: F, fontSize: '9px', color: '#e2e2e6', align: 'center', wordWrap: { width: 175 }
           }).setOrigin(0.5).setDepth(151);
         });
@@ -521,10 +763,10 @@ export class CombatScene extends Phaser.Scene {
         bg.on('pointerover', () => {
           this.relicTooltip?.destroy();
           this.relicTooltipBg?.destroy();
-          const stackInfo = isStacking ? `\nStack: ${this.relicManager.getStack(relic.id)}` : '';
+          const stackInfo = isStacking ? this._t('stackInfo')(this.relicManager.getStack(relic.id)) : '';
           this.relicTooltipBg = this.add.rectangle(x - 65, y + 32, 190, 48, C.bgPanel, 0.97)
             .setStrokeStyle(1, C.bgPanelDark).setDepth(150);
-          this.relicTooltip = this.add.text(x - 65, y + 32, `${relic.name}\n${relic.description}${stackInfo}`, {
+          this.relicTooltip = this.add.text(x - 65, y + 32, `${LocaleManager.name(relic)}\n${LocaleManager.desc(relic)}${stackInfo}`, {
             fontFamily: F, fontSize: '10px', color: '#e2e2e6', align: 'center', wordWrap: { width: 175 }
           }).setOrigin(0.5).setDepth(151);
         });
@@ -555,7 +797,7 @@ export class CombatScene extends Phaser.Scene {
 
   activateRelicAbility(relic) {
     if (!this.relicManager.isRelicCharged(relic.id)) {
-      this.showMessage(`${relic.name} già usata!`, '#8c8c96');
+      this.showMessage(this._t('relicGiaUsata')(LocaleManager.name(relic)), '#8c8c96');
       return;
     }
 
@@ -566,7 +808,7 @@ export class CombatScene extends Phaser.Scene {
 
     if (effect.directDamage && this.enemy.isAlive()) {
       const dmgResult = this.enemy.takeDamage(effect.directDamage);
-      msgs.push(`${effect.directDamage} danni`);
+      msgs.push(`${effect.directDamage} ${this._t('danni')}`);
       this.shakeEnemySprite();
       this.cameras.main.shake(120, 0.008);
       const dmgText = this.add.text(this.enemyCenter.x, this.enemyCenter.y - 25, `-${effect.directDamage}`, {
@@ -578,7 +820,7 @@ export class CombatScene extends Phaser.Scene {
         targets: dmgText, y: this.enemyCenter.y - 70, alpha: 0,
         duration: 900, ease: 'Power2', onComplete: () => dmgText.destroy()
       });
-      if (dmgResult.phaseTransition) this.onPhaseTransition(dmgResult.phaseTransition.name);
+      if (dmgResult.phaseTransition) this.onPhaseTransition(LocaleManager.name(dmgResult.phaseTransition));
       if (!this.enemy.isAlive()) {
         const killEffects = this.relicManager.trigger('onKill');
         killEffects.forEach(({ effect: ke }) => {
@@ -602,18 +844,18 @@ export class CombatScene extends Phaser.Scene {
 
     if (effect.applyStun && this.enemy.isAlive()) {
       this.enemy.statusEffects.stun = effect.applyStun;
-      msgs.push('💫 Stordito!');
+      msgs.push(`💫 ${this._t('stordimento')}`);
       this.updateStatusUI();
       this.updateIntentDisplay();
     }
 
     if (effect.applyPoison && this.enemy.isAlive()) {
       this.enemy.statusEffects.poison = Math.max(0, (this.enemy.statusEffects.poison || 0) + effect.applyPoison);
-      msgs.push(`🟢 Veleno ${effect.applyPoison}`);
+      msgs.push(`🟢 ${this._t('veleno')} ${effect.applyPoison}`);
       this.updateStatusUI();
     }
 
-    if (msgs.length > 0) this.showMessage(`${relic.name}: ${msgs.join('  ')}`, '#e8b84b');
+    if (msgs.length > 0) this.showMessage(this._t('relicMsg')(LocaleManager.name(relic), msgs.join('  ')), '#e8b84b');
 
     this.updateEnemyUI();
     this.updatePlayerUI();
@@ -630,7 +872,7 @@ export class CombatScene extends Phaser.Scene {
     this.slancioBg = this.add.rectangle(x, y, 82, 28, 0x2a0f0f, 0.9)
       .setStrokeStyle(1, C.bgPanelDark).setDepth(71).setAlpha(0)
       .setInteractive({ useHandCursor: false });
-    this.slancioLabel = this.add.text(x - 28, y, 'SLANCIO', {
+    this.slancioLabel = this.add.text(x - 28, y, this._t('slancioLabel'), {
       fontFamily: F, fontSize: '7px', color: '#e85d5d', fontStyle: '700', letterSpacing: 1
     }).setOrigin(0, 0.5).setDepth(72).setAlpha(0);
     this.slancioText = this.add.text(x + 22, y, '', {
@@ -642,8 +884,7 @@ export class CombatScene extends Phaser.Scene {
       this.relicTooltipBg?.destroy();
       this.relicTooltipBg = this.add.rectangle(x, y + 38, 230, 44, C.bgPanelDark, 0.97)
         .setStrokeStyle(1, C.hp).setDepth(150);
-      this.relicTooltip = this.add.text(x, y + 38,
-        '⚡ Attacchi consecutivi moltiplicano il danno.\nSi azzera giocando carte non-attacco.', {
+      this.relicTooltip = this.add.text(x, y + 38, this._t('slancioTooltip'), {
         fontFamily: F, fontSize: '10px', color: '#e87070', align: 'center', wordWrap: { width: 215 }
       }).setOrigin(0.5).setDepth(151);
     });
@@ -678,7 +919,7 @@ export class CombatScene extends Phaser.Scene {
     this.caricaBg = this.add.rectangle(x, y, 82, 28, C.defendDark, 0.9)
       .setStrokeStyle(1, C.bgPanelDark).setDepth(71).setAlpha(0)
       .setInteractive({ useHandCursor: true });
-    this.caricaLabel = this.add.text(x - 22, y, 'CARICA', {
+    this.caricaLabel = this.add.text(x - 22, y, this._t('caricaLabel'), {
       fontFamily: F, fontSize: '7px', color: '#7bb5e8', fontStyle: '700', letterSpacing: 1
     }).setOrigin(0, 0.5).setDepth(72).setAlpha(0);
     this.caricaCountText = this.add.text(x + 22, y, '0', {
@@ -697,8 +938,7 @@ export class CombatScene extends Phaser.Scene {
       this.relicTooltipBg?.destroy();
       this.relicTooltipBg = this.add.rectangle(x, y + 38, 230, 44, C.bgPanelDark, 0.97)
         .setStrokeStyle(1, C.mana).setDepth(150);
-      this.relicTooltip = this.add.text(x, y + 38,
-        '💥 Clicca per attivare: il prossimo attacco\ninfligge +5 danni per ogni punto accumulato.', {
+      this.relicTooltip = this.add.text(x, y + 38, this._t('caricaTooltip'), {
         fontFamily: F, fontSize: '10px', color: '#7bb5e8', align: 'center', wordWrap: { width: 215 }
       }).setOrigin(0.5).setDepth(151);
     });
@@ -754,7 +994,7 @@ export class CombatScene extends Phaser.Scene {
       .setInteractive({ useHandCursor: true })
       .setDepth(71);
 
-    this.classAbilityLabel = this.add.text(btnX, btnY, `${ability.emoji} ${ability.name}`, {
+    this.classAbilityLabel = this.add.text(btnX, btnY, `${ability.emoji} ${LocaleManager.name(ability)}`, {
       fontFamily: F, fontSize: '10px', color: '#86efac', fontStyle: '700'
     }).setOrigin(0.5).setDepth(72);
 
@@ -771,7 +1011,7 @@ export class CombatScene extends Phaser.Scene {
       _ttBg.fillRoundedRect(tx - 95, ty, 190, 36, 6);
       _ttBg.lineStyle(1, C.skill, 0.8);
       _ttBg.strokeRoundedRect(tx - 95, ty, 190, 36, 6);
-      _ttTxt = this.add.text(tx, ty + 18, ability.description, {
+      _ttTxt = this.add.text(tx, ty + 18, LocaleManager.desc(ability), {
         fontFamily: F, fontSize: '9px', color: '#6ee7b7',
         wordWrap: { width: 180 }, align: 'center'
       }).setOrigin(0.5).setDepth(201);
@@ -794,7 +1034,7 @@ export class CombatScene extends Phaser.Scene {
     if (used) {
       this.classAbilityBg.setStrokeStyle(1, 0x555555);
       this.classAbilityBg.setFillStyle(0x1a1a1a, 0.9);
-      this.classAbilityLabel.setColor('#555555').setText('✓ USATA');
+      this.classAbilityLabel.setColor('#555555').setText(this._t('abilitaGiaUsata'));
     } else {
       this.classAbilityBg.setStrokeStyle(2, C.skill);
       this.classAbilityBg.setFillStyle(C.btnSuccess, 0.95);
@@ -802,7 +1042,7 @@ export class CombatScene extends Phaser.Scene {
       const classData = classId ? CLASSES.find(c => c.id === classId) : null;
       if (classData && classData.classAbility) {
         const ab = classData.classAbility;
-        this.classAbilityLabel.setColor('#86efac').setText(`${ab.emoji} ${ab.name}`);
+        this.classAbilityLabel.setColor('#86efac').setText(`${ab.emoji} ${LocaleManager.name(ab)}`);
       }
     }
   }
@@ -810,7 +1050,7 @@ export class CombatScene extends Phaser.Scene {
   useClassAbility() {
     if (this._paused) return;
     if (!this.runData || this.runData.classAbilityUsed) {
-      this.showMessage('Abilità già usata!', '#8c8c96');
+      this.showMessage(this._t('abilitaUsata'), '#8c8c96');
       return;
     }
     const classId = this.runData.classId;
@@ -820,7 +1060,7 @@ export class CombatScene extends Phaser.Scene {
       this.player.addBlock(10);
       this.player.combatStrength += 2;
       this.player.strength += 2;
-      this.showMessage('⚔️ Grido di Guerra! +10 Blocco, +2 Forza', '#86efac');
+      this.showMessage(this._t('gridoDiGuerra'), '#86efac');
       this.showPlayerEffect('+10 🛡', '#7bb5e8');
       this.updatePlayerUI();
     } else if (classId === 'rogue') {
@@ -829,12 +1069,12 @@ export class CombatScene extends Phaser.Scene {
         this.createHandSprites(drawn);
         this.updateDeckCounters();
       }
-      this.showMessage('🗡️ Ombra! Pescate 3 carte.', '#86efac');
+      this.showMessage(this._t('ombra'), '#86efac');
     } else if (classId === 'alchemist') {
       if (this.enemy.isAlive()) {
         this.enemy.statusEffects.poison = (this.enemy.statusEffects.poison || 0) + 8;
         this.updateStatusUI();
-        this.showMessage('⚗️ Fiala Tossica! +8 Veleno al nemico.', '#86efac');
+        this.showMessage(this._t('fialaTossica'), '#86efac');
       }
     }
 
@@ -852,7 +1092,7 @@ export class CombatScene extends Phaser.Scene {
     const fcBg = this.add.rectangle(820, 24, 160, 24, C.bgPanelDark, 0.8)
       .setStrokeStyle(1, fc.badgeColor, 0.6).setDepth(71)
       .setInteractive({ useHandCursor: false });
-    this.add.text(820, 24, `${fc.badge} ${fc.name}`, {
+    this.add.text(820, 24, `${fc.badge} ${LocaleManager.name(fc)}`, {
       fontFamily: F, fontSize: '9px', color: colorStr, fontStyle: '700'
     }).setOrigin(0.5).setDepth(72);
 
@@ -861,7 +1101,7 @@ export class CombatScene extends Phaser.Scene {
       this.relicTooltipBg?.destroy();
       this.relicTooltipBg = this.add.rectangle(820, 60, 240, 36, C.bgPanelDark, 0.97)
         .setStrokeStyle(1, fc.badgeColor).setDepth(150);
-      this.relicTooltip = this.add.text(820, 60, fc.description, {
+      this.relicTooltip = this.add.text(820, 60, LocaleManager.desc(fc), {
         fontFamily: F, fontSize: '10px', color: colorStr, align: 'center', wordWrap: { width: 225 }
       }).setOrigin(0.5).setDepth(151);
     });
@@ -933,7 +1173,7 @@ export class CombatScene extends Phaser.Scene {
       : this.nodeType === 'elite'
         ? '#' + C.textGoldBright.toString(16).padStart(6, '0')
         : '#' + C.textGoldBright.toString(16).padStart(6, '0');
-    this.add.text(panelX, panelY + 10, enemyData.name, {
+    this.add.text(panelX, panelY + 10, LocaleManager.name(enemyData), {
       fontFamily: FONT_TITLE, fontSize: '20px', color: nameColorHex, fontStyle: '700'
     }).setOrigin(0.5).setDepth(4);
 
@@ -944,7 +1184,7 @@ export class CombatScene extends Phaser.Scene {
       fontStyle: '700'
     }).setOrigin(0.5).setDepth(4);
     if (this.enemy.phases) {
-      this.enemyPhaseText.setText(this.enemy.phases[0].name);
+      this.enemyPhaseText.setText(LocaleManager.name(this.enemy.phases[0]));
     }
 
     // ── HP bar arrotondata ────────────────────────────────────────────────
@@ -1183,7 +1423,7 @@ export class CombatScene extends Phaser.Scene {
     if (this.statusWeaknessText) {
       const w = se.weakness || 0;
       this.statusWeaknessBg.setVisible(w > 0);
-      this.statusWeaknessText.setText(w > 0 ? `⬇️ Deb ${w}` : '');
+      this.statusWeaknessText.setText(w > 0 ? `⬇️ ${this._t('debolezza')} ${w}` : '');
     }
 
     // Status effect giocatore
@@ -1210,7 +1450,7 @@ export class CombatScene extends Phaser.Scene {
 
     // M3 — Mostra stordimento se nemico è stordito
     if (this.enemy.statusEffects && this.enemy.statusEffects.stun > 0) {
-      this.intentText.setText('💫 STORDITO');
+      this.intentText.setText(this._t('stordito'));
       this.intentText.setColor('#' + C.stun.toString(16).padStart(6, '0'));
       this.intentBg.setStrokeStyle(1, C.stun);
       return;
@@ -1224,18 +1464,18 @@ export class CombatScene extends Phaser.Scene {
       this.intentText.setColor('#' + C.hp.toString(16).padStart(6, '0'));
       this.intentBg.setStrokeStyle(1, C.hp);
     } else if (intent.type === 'defend') {
-      this.intentText.setText(`DEF  +${intent.value} blocco`);
+      this.intentText.setText(this._t('defIntent')(intent.value));
       this.intentText.setColor('#' + C.mana.toString(16).padStart(6, '0'));
       this.intentBg.setStrokeStyle(1, C.mana);
     } else if (intent.type === 'heal') {
-      this.intentText.setText(`💚 Cura +${intent.value}`);
+      this.intentText.setText(this._t('healIntent')(intent.value));
       this.intentText.setColor('#' + C.skill.toString(16).padStart(6, '0'));
       this.intentBg.setStrokeStyle(1, C.skill);
     } else if (intent.type === 'status') {
       const parts = [];
-      if (intent.applyPoison) parts.push(`☠ Veleno ${intent.applyPoison}`);
-      if (intent.applyBurn) parts.push(`🔥 Bruciatura ${intent.applyBurn}`);
-      this.intentText.setText(parts.join('  ') || intent.label || 'Stato');
+      if (intent.applyPoison) parts.push(`☠ ${this._t('veleno')} ${intent.applyPoison}`);
+      if (intent.applyBurn) parts.push(`🔥 ${this._t('bruciatura')} ${intent.applyBurn}`);
+      this.intentText.setText(parts.join('  ') || intent.label || this._t('statoIntent'));
       this.intentText.setColor('#' + C.curse.toString(16).padStart(6, '0'));
       this.intentBg.setStrokeStyle(1, C.curse);
     }
@@ -1337,7 +1577,7 @@ export class CombatScene extends Phaser.Scene {
     this.updateEnergyUI();
     this.updateDeckCounters();
     this.updateIntentDisplay();
-    this.turnText.setText(`Turno ${this.combat.turnNumber}`);
+    this.turnText.setText(`${this._t('turno')} ${this.combat.turnNumber}`);
     this.updateSlancioUI();
     this.updateCaricaUI();
   }
@@ -1354,8 +1594,8 @@ export class CombatScene extends Phaser.Scene {
       const fanPos = this.getCardFanPosition(globalIndex, totalAfter);
 
       const sprite = new CardSprite(this, deckX, deckY, {
-        type: card.type, name: card.name, cost: card.cost,
-        value: card.value, description: card.description,
+        type: card.type, name: LocaleManager.name(card), cost: card.cost,
+        value: card.value, description: LocaleManager.desc(card),
         isCurse: card.isCurse,
       });
 
@@ -1404,7 +1644,7 @@ export class CombatScene extends Phaser.Scene {
 
     const card = cardSprite.cardModel;
     if (!card.canPlay(this.player.energy)) {
-      this.showMessage('Energia insufficiente!', '#e85d5d');
+      this.showMessage(this._t('energiaInsufficiente'), '#e85d5d');
       cardSprite.returnToPosition();
       return;
     }
@@ -1513,7 +1753,7 @@ export class CombatScene extends Phaser.Scene {
 
         // M4 — Phase transition
         if (result.phaseTransition) {
-          this.onPhaseTransition(result.phaseTransition.name);
+          this.onPhaseTransition(LocaleManager.name(result.phaseTransition));
         }
 
         this.tweens.add({
@@ -1618,28 +1858,28 @@ export class CombatScene extends Phaser.Scene {
         this.playSound('attack-hit');
 
         const attackMsgs = [];
-        if (result.slancioBonusDamage > 0) attackMsgs.push(`⚡ Slancio ×${result.slancioCountBefore}`);
-        if (result.caricaBonus) attackMsgs.push(`💥 Carica +${result.caricaBonus}!`);
-        if (result.floorBonus) attackMsgs.push(`+${result.floorBonus} (piano)`);
-        if (result.blockGained) attackMsgs.push(`+${result.blockGained} Blocco`);
+        if (result.slancioBonusDamage > 0) attackMsgs.push(`⚡ ${this._t('slancioLabel')} ×${result.slancioCountBefore}`);
+        if (result.caricaBonus) attackMsgs.push(`💥 ${this._t('caricaLabel')} +${result.caricaBonus}!`);
+        if (result.floorBonus) attackMsgs.push(`+${result.floorBonus} (${this._t('piano')})`);
+        if (result.blockGained) attackMsgs.push(`+${result.blockGained} ${this._t('blocco')}`);
         if (result.healed) attackMsgs.push(`+${result.healed} HP`);
-        if (result.selfDamage) attackMsgs.push(`-${result.selfDamage} HP (costo)`);
+        if (result.selfDamage) attackMsgs.push(`-${result.selfDamage} HP`);
         // M3 status
-        if (result.appliedPoison) attackMsgs.push(`🟢 Veleno ${result.appliedPoison}`);
-        if (result.appliedBurn) attackMsgs.push(`🔥 Bruciatura ${result.appliedBurn}`);
-        if (result.appliedStun) attackMsgs.push(`💫 Stordito!`);
-        if (result.appliedWeakness) attackMsgs.push(`⬇️ Deb ${result.appliedWeakness}!`);
-        if (result.appliedArmor) attackMsgs.push(`🛡️ Corazza +${result.appliedArmor.value}`);
+        if (result.appliedPoison) attackMsgs.push(`🟢 ${this._t('veleno')} ${result.appliedPoison}`);
+        if (result.appliedBurn) attackMsgs.push(`🔥 ${this._t('bruciatura')} ${result.appliedBurn}`);
+        if (result.appliedStun) attackMsgs.push(`💫 ${this._t('stordimento')}`);
+        if (result.appliedWeakness) attackMsgs.push(`⬇️ ${this._t('debolezza')} ${result.appliedWeakness}!`);
+        if (result.appliedArmor) attackMsgs.push(`🛡️ ${this._t('blocco')} +${result.appliedArmor.value}`);
         if (attackMsgs.length > 0) this.showMessage(attackMsgs.join('  '), '#e8b84b');
         break;
       }
       case 'defend': {
         const defMsgs = [];
         if (result.counterDamage) {
-          defMsgs.push(`${result.counterDamage} danni!`);
+          defMsgs.push(`${result.counterDamage} ${this._t('danni')}!`);
           this.shakeEnemySprite();
         }
-        if (result.drawCards > 0) defMsgs.push(`+${result.drawCards} carte`);
+        if (result.drawCards > 0) defMsgs.push(`+${result.drawCards} ${this._t('carte')}`);
         if (defMsgs.length > 0) this.showMessage(defMsgs.join('  '), '#7bb5e8');
         if (result.block) this.showPlayerEffect(`+${result.block} 🛡`, '#' + C.mana.toString(16).padStart(6, '0'));
         // M5
@@ -1649,15 +1889,17 @@ export class CombatScene extends Phaser.Scene {
       case 'skill': {
         const messages = [];
         if (result.strengthGained) {
-          const label = result.strengthTemporary ? `+${result.strengthGained} Forza (turno)` : `+${result.strengthGained} Forza`;
+          const label = result.strengthTemporary
+            ? this._t('forzaTurno')(result.strengthGained)
+            : this._t('forzaPerm')(result.strengthGained);
           messages.push(label);
         }
-        if (result.energyGained) messages.push(`+${result.energyGained} Energia`);
-        if (result.drawCards > 0) messages.push(`+${result.drawCards} carte`);
-        if (result.appliedStun) messages.push(`💫 Stordito!`);
-        if (result.appliedPoison) messages.push(`🟢 Veleno ${result.appliedPoison}`);
-        if (result.appliedWeakness) messages.push(`⬇️ Deb ${result.appliedWeakness}!`);
-        if (result.appliedArmor) messages.push(`🛡️ Corazza +${result.appliedArmor.value}`);
+        if (result.energyGained) messages.push(`+${result.energyGained} ${this._t('energia')}`);
+        if (result.drawCards > 0) messages.push(`+${result.drawCards} ${this._t('carte')}`);
+        if (result.appliedStun) messages.push(`💫 ${this._t('stordimento')}`);
+        if (result.appliedPoison) messages.push(`🟢 ${this._t('veleno')} ${result.appliedPoison}`);
+        if (result.appliedWeakness) messages.push(`⬇️ ${this._t('debolezza')} ${result.appliedWeakness}!`);
+        if (result.appliedArmor) messages.push(`🛡️ ${this._t('blocco')} +${result.appliedArmor.value}`);
         if (messages.length > 0) this.showMessage(messages.join('  '), '#' + C.textGold.toString(16).padStart(6, '0'));
         if (result.healed) this.showPlayerEffect(`+${result.healed} HP`, '#' + C.skill.toString(16).padStart(6, '0'));
         if (result.block) this.showPlayerEffect(`+${result.block} 🛡`, '#7bb5e8');
@@ -1668,9 +1910,9 @@ export class CombatScene extends Phaser.Scene {
         // M2B — maledizione
         const curseMsgs = [];
         if (result.selfDamage) curseMsgs.push(`-${result.selfDamage} HP`);
-        if (result.curseDiscard) curseMsgs.push(`Scarta ${result.curseDiscard} carta!`);
-        if (result.curseBlock) curseMsgs.push(`Nemico +${result.curseBlock} blocco`);
-        this.showMessage(curseMsgs.length > 0 ? curseMsgs.join('  ') : '☠ Maledizione!', '#cc88ff');
+        if (result.curseDiscard) curseMsgs.push(this._t('scartaCarta')(result.curseDiscard));
+        if (result.curseBlock) curseMsgs.push(this._t('nemicoBlocko')(result.curseBlock));
+        this.showMessage(curseMsgs.length > 0 ? curseMsgs.join('  ') : this._t('maledizione'), '#cc88ff');
         break;
       }
     }
@@ -1757,7 +1999,7 @@ export class CombatScene extends Phaser.Scene {
 
     // M3 — Nemico stordito: salta il turno
     if (result.type === 'stunned') {
-      this.showMessage(`${this.enemy.name} è stordito! Salta il turno.`, '#e8b84b');
+      this.showMessage(this._t('eStordito')(LocaleManager.name(this.enemy)), '#e8b84b');
       this.updateIntentDisplay();
       this.time.delayedCall(800, () => this.newPlayerTurn());
       return;
@@ -1804,17 +2046,17 @@ export class CombatScene extends Phaser.Scene {
         }
 
         if (result.blocked > 0) {
-          this.showMessage(`${result.blocked} danni bloccati!`, '#7bb5e8');
+          this.showMessage(this._t('danniBloccati')(result.blocked), '#7bb5e8');
         }
         if (result.weaknessReduced) {
-          this.showMessage(`${this.enemy.name} è indebolito! -30% danni.`, '#d8b4fe');
+          this.showMessage(this._t('indebolito')(LocaleManager.name(this.enemy)), '#d8b4fe');
         }
 
         if (result.appliedPoisonToPlayer) {
-          this.showPlayerEffect(`☠ Veleno!`, '#9b59b6');
+          this.showPlayerEffect(`☠ ${this._t('veleno')}!`, '#9b59b6');
         }
         if (result.appliedBurnToPlayer) {
-          this.showPlayerEffect(`🔥 Bruciatura!`, '#e67e22');
+          this.showPlayerEffect(`🔥 ${this._t('bruciatura')}!`, '#e67e22');
         }
         if (result.appliedPoisonToPlayer || result.appliedBurnToPlayer) {
           this.updateStatusUI();
@@ -1825,7 +2067,7 @@ export class CombatScene extends Phaser.Scene {
           thornEffects.forEach(({ effect }) => {
             if (effect.thorns && this.enemy.isAlive()) {
               this.enemy.takeDamage(effect.thorns);
-              this.showMessage(`${effect.thorns} danni di ritorno!`, '#5dc77a');
+              this.showMessage(this._t('danniRitorno')(effect.thorns), '#5dc77a');
               this.updateEnemyUI();
             }
             if (effect.block) {
@@ -1860,23 +2102,23 @@ export class CombatScene extends Phaser.Scene {
         this.time.delayedCall(600, () => this.newPlayerTurn());
       });
     } else if (result.type === 'defend') {
-      this.showMessage(`${this.enemy.name} si difende! +${result.value} blocco`, '#7bb5e8');
+      this.showMessage(this._t('difende')(LocaleManager.name(this.enemy), result.value), '#7bb5e8');
       this.updateEnemyUI();
       this.time.delayedCall(800, () => this.newPlayerTurn());
     } else if (result.type === 'heal') {
-      this.showMessage(`${this.enemy.name} si cura! +${result.enemyHealed} HP`, '#5dc77a');
+      this.showMessage(this._t('siCura')(LocaleManager.name(this.enemy), result.enemyHealed), '#5dc77a');
       this.updateEnemyUI();
       this.time.delayedCall(800, () => this.newPlayerTurn());
     } else if (result.type === 'status') {
       if (result.appliedPoisonToPlayer) {
-        this.showPlayerEffect(`☠ Veleno!`, '#9b59b6');
+        this.showPlayerEffect(`☠ ${this._t('veleno')}!`, '#9b59b6');
       }
       if (result.appliedBurnToPlayer) {
-        this.showPlayerEffect(`🔥 Bruciatura!`, '#e67e22');
+        this.showPlayerEffect(`🔥 ${this._t('bruciatura')}!`, '#e67e22');
       }
       const statusMsgs = [];
-      if (result.appliedPoisonToPlayer) statusMsgs.push(`☠ Veleno ${result.appliedPoisonToPlayer}`);
-      if (result.appliedBurnToPlayer) statusMsgs.push(`🔥 Bruciatura ${result.appliedBurnToPlayer}`);
+      if (result.appliedPoisonToPlayer) statusMsgs.push(`☠ ${this._t('veleno')} ${result.appliedPoisonToPlayer}`);
+      if (result.appliedBurnToPlayer) statusMsgs.push(`🔥 ${this._t('bruciatura')} ${result.appliedBurnToPlayer}`);
       if (statusMsgs.length > 0) this.showMessage(statusMsgs.join('  '), '#9b59b6');
       this.updatePlayerUI();
       this.updateStatusUI();
@@ -2013,7 +2255,7 @@ export class CombatScene extends Phaser.Scene {
     }
 
     // Testo "SCONFITTO!" al centro
-    const sconfittoText = this.add.text(width / 2, height / 2 - 60, 'SCONFITTO!', {
+    const sconfittoText = this.add.text(width / 2, height / 2 - 60, this._t('sconfittoLabel'), {
       fontFamily: FONT_TITLE, fontSize: '36px',
       color: '#' + C.hp.toString(16).padStart(6, '0'),
       fontStyle: '900', stroke: '#000000', strokeThickness: 6
@@ -2038,19 +2280,19 @@ export class CombatScene extends Phaser.Scene {
         radius: 14, fill: C.bgPanel, border: C.borderGold, borderWidth: 2, depth: 200
       });
 
-      this.add.text(width / 2, height / 2 - 60, 'VITTORIA!', {
+      this.add.text(width / 2, height / 2 - 60, this._t('vittoria'), {
         fontFamily: FONT_TITLE, fontSize: '44px',
         color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
         fontStyle: '900', stroke: '#000000', strokeThickness: 4
       }).setOrigin(0.5).setDepth(201);
 
-      this.add.text(width / 2, height / 2 - 10, `+${goldReward} oro`, {
+      this.add.text(width / 2, height / 2 - 10, `+${goldReward} ${this._t('oro')}`, {
         fontFamily: FONT_UI, fontSize: '20px',
         color: '#' + C.textGold.toString(16).padStart(6, '0'),
         fontStyle: '700'
       }).setOrigin(0.5).setDepth(201);
 
-      this.add.text(width / 2, height / 2 + 36, 'Clicca per continuare', {
+      this.add.text(width / 2, height / 2 + 36, this._t('clickContinua'), {
         fontFamily: FONT_UI, fontSize: '13px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0')
       }).setOrigin(0.5).setDepth(201);
@@ -2104,18 +2346,18 @@ export class CombatScene extends Phaser.Scene {
       radius: 14, fill: C.bgPanel, border: C.hp, borderWidth: 2, depth: 200
     });
 
-    this.add.text(width / 2, height / 2 - 45, 'SCONFITTA', {
+    this.add.text(width / 2, height / 2 - 45, this._t('sconfitta'), {
       fontFamily: FONT_TITLE, fontSize: '44px',
       color: '#' + C.hp.toString(16).padStart(6, '0'),
       fontStyle: '900', stroke: '#000000', strokeThickness: 4
     }).setOrigin(0.5).setDepth(201);
 
-    this.add.text(width / 2, height / 2 + 8, 'La tua run è finita.', {
+    this.add.text(width / 2, height / 2 + 8, this._t('runFinita'), {
       fontFamily: FONT_UI, fontSize: '15px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0')
     }).setOrigin(0.5).setDepth(201);
 
-    this.add.text(width / 2, height / 2 + 38, 'Clicca per ricominciare', {
+    this.add.text(width / 2, height / 2 + 38, this._t('clickRicomincia'), {
       fontFamily: FONT_UI, fontSize: '13px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0')
     }).setOrigin(0.5).setDepth(201);
@@ -2251,7 +2493,7 @@ export class CombatScene extends Phaser.Scene {
       .setDepth(200).setInteractive();
     this.pileOverlayGroup.add(bg);
 
-    const titleText = this.add.text(width / 2, 30, `${title} (${cards.length} carte)`, {
+    const titleText = this.add.text(width / 2, 30, `${title} (${cards.length} ${this._t('carte')})`, {
       fontFamily: FONT_TITLE, fontSize: '18px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
       fontStyle: '700'
@@ -2259,7 +2501,7 @@ export class CombatScene extends Phaser.Scene {
     this.pileOverlayGroup.add(titleText);
 
     if (cards.length === 0) {
-      const emptyText = this.add.text(width / 2, height / 2, 'Nessuna carta', {
+      const emptyText = this.add.text(width / 2, height / 2, this._t('nessunaCarta'), {
         fontFamily: FONT_UI, fontSize: '15px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0')
       }).setOrigin(0.5).setDepth(201);
@@ -2294,13 +2536,13 @@ export class CombatScene extends Phaser.Scene {
           fontStyle: '700'
         }).setOrigin(0.5).setDepth(202));
 
-        this.pileOverlayGroup.add(this.add.text(x + 8, y - 9, card.name, {
+        this.pileOverlayGroup.add(this.add.text(x + 8, y - 9, LocaleManager.name(card), {
           fontFamily: FONT_TITLE, fontSize: '11px',
           color: card.isCurse ? '#cc88ff' : '#' + C.textPrimary.toString(16).padStart(6, '0'),
           fontStyle: '700'
         }).setOrigin(0.5).setDepth(202));
 
-        this.pileOverlayGroup.add(this.add.text(x + 8, y + 10, card.description.replace(/\n/g, ' '), {
+        this.pileOverlayGroup.add(this.add.text(x + 8, y + 10, LocaleManager.desc(card).replace(/\n/g, ' '), {
           fontFamily: FONT_BODY, fontSize: '9px',
           color: '#' + C.textSecondary.toString(16).padStart(6, '0')
         }).setOrigin(0.5).setDepth(202));
@@ -2308,7 +2550,7 @@ export class CombatScene extends Phaser.Scene {
     }
 
     const { bg: closeBg, txt: closeTxt } = createButton(
-      this, width / 2, height - 40, 140, 36, 'CHIUDI',
+      this, width / 2, height - 40, 140, 36, this._t('chiudi'),
       {
         fill: C.btnDanger, hover: C.btnDangerHov, border: C.hp,
         borderWidth: 2, radius: 6, depth: 201, fontSize: '13px', font: FONT_UI, fontStyle: '700',
@@ -2341,26 +2583,26 @@ export class CombatScene extends Phaser.Scene {
       .setDepth(200).setInteractive();
     this.legendOverlayGroup.add(bg);
 
-    this.legendOverlayGroup.add(this.add.text(width / 2, 28, 'Guida agli Effetti', {
+    this.legendOverlayGroup.add(this.add.text(width / 2, 28, this._t('guidaEffetti'), {
       fontFamily: FONT_TITLE, fontSize: '18px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
       fontStyle: '700'
     }).setOrigin(0.5).setDepth(201));
 
     const entries = [
-      { term: 'ATK  Attacco',         desc: 'Infligge danni al nemico. Trascina sulla zona nemico.' },
-      { term: 'DEF  Difesa / Blocco', desc: 'Riduce i danni subiti questo turno. Si azzera ad ogni turno.' },
-      { term: 'STR  Forza',           desc: 'Ogni punto di forza aggiunge +1 danno ad ogni attacco.' },
-      { term: 'EN   Energia',         desc: 'Serve per giocare le carte. Si ripristina ad ogni turno.' },
-      { term: '⚡ Slancio',           desc: 'Ogni carta attacco giocata di fila aumenta lo Slancio. Il danno dell\'attacco successivo viene moltiplicato per lo Slancio. Si azzera se giochi una carta non-attacco.' },
-      { term: '💥 Carica',           desc: 'Alcune carte accumlano punti Carica. Clicca il badge CARICA per attivarlo: il prossimo attacco infligge +5 danni per ogni punto accumulato.' },
-      { term: '☠ Veleno',             desc: 'Infligge N danni a fine turno al nemico, poi si riduce di 1.' },
-      { term: '🔥 Bruciatura',        desc: 'Infligge N danni fissi a fine turno al nemico, poi si azzera.' },
-      { term: '💫 Stordimento',       desc: 'Il nemico salta il prossimo turno.' },
-      { term: '☠  Maledizione',       desc: 'Carta negativa nel mazzo. Ha effetti dannosi quando giocata.' },
-      { term: 'Pesca carte',          desc: 'Pesca carte extra dal mazzo di pesca nella mano.' },
-      { term: 'Colpi multipli',       desc: 'La carta colpisce più volte. Il blocco nemico riduce ogni colpo.' },
-      { term: 'Reliquie',             desc: 'Bonus passivi raccolti da elite e boss. Visibili in alto a destra.' },
+      { term: this._t('atkDesc'),   desc: this._t('atkBody') },
+      { term: this._t('defDesc'),   desc: this._t('defBody') },
+      { term: this._t('strDesc'),   desc: this._t('strBody') },
+      { term: this._t('enDesc'),    desc: this._t('enBody') },
+      { term: this._t('slancioDesc'), desc: this._t('slancioBody') },
+      { term: this._t('caricaDesc'), desc: this._t('caricaBody') },
+      { term: this._t('velenoDesc'), desc: this._t('velenoBody') },
+      { term: this._t('bruciDesc'), desc: this._t('bruciBody') },
+      { term: this._t('stordDesc'), desc: this._t('stordBody') },
+      { term: this._t('malDesc'),   desc: this._t('malBody') },
+      { term: this._t('pescaDesc'), desc: this._t('pescaBody') },
+      { term: this._t('colpiDesc'), desc: this._t('colpiBody') },
+      { term: this._t('relicDesc'), desc: this._t('relicBody') },
     ];
 
     const startY = 65, lineH = 44;
@@ -2386,7 +2628,7 @@ export class CombatScene extends Phaser.Scene {
     });
 
     const { bg: closeBg2, txt: closeTxt2 } = createButton(
-      this, width / 2, height - 40, 140, 36, 'CHIUDI',
+      this, width / 2, height - 40, 140, 36, this._t('chiudi'),
       {
         fill: C.btnDanger, hover: C.btnDangerHov, border: C.hp,
         borderWidth: 2, radius: 6, depth: 201, fontSize: '13px', font: FONT_UI, fontStyle: '700',
@@ -2440,7 +2682,7 @@ export class CombatScene extends Phaser.Scene {
     this._pauseGroup.push(panel);
 
     // Titolo "IN PAUSA"
-    const title = this.add.text(cx, cy - 105, 'IN PAUSA', {
+    const title = this.add.text(cx, cy - 105, this._t('inPausa'), {
       fontFamily: FONT_TITLE, fontSize: '28px',
       color: '#' + (0xf0d880).toString(16).padStart(6, '0'),
       fontStyle: '700'
@@ -2449,7 +2691,7 @@ export class CombatScene extends Phaser.Scene {
 
     // Bottone 1: RIPRENDI
     const btnY1 = cy - 38;
-    const { bg: bg1, txt: txt1 } = createButton(this, cx, btnY1, 220, 40, '▶ RIPRENDI', {
+    const { bg: bg1, txt: txt1 } = createButton(this, cx, btnY1, 220, 40, this._t('riprendi'), {
       fill: 0x1a2540, hover: 0x253560, border: 0xc9a84c, borderWidth: 2,
       radius: 8, depth: 502, fontSize: '15px', font: FONT_UI, fontStyle: '700', letterSpacing: 2,
       onClick: () => this._togglePause()
@@ -2458,7 +2700,7 @@ export class CombatScene extends Phaser.Scene {
 
     // Bottone 2: IMPOSTAZIONI
     const btnY2 = cy + 14;
-    const { bg: bg2, txt: txt2 } = createButton(this, cx, btnY2, 220, 40, '⚙ IMPOSTAZIONI', {
+    const { bg: bg2, txt: txt2 } = createButton(this, cx, btnY2, 220, 40, this._t('impostazioni'), {
       fill: 0x1a2540, hover: 0x253560, border: 0xc9a84c, borderWidth: 2,
       radius: 8, depth: 502, fontSize: '15px', font: FONT_UI, fontStyle: '700', letterSpacing: 2,
       onClick: () => { this.scene.launch('Settings'); this.scene.pause(); }
@@ -2467,7 +2709,7 @@ export class CombatScene extends Phaser.Scene {
 
     // Bottone 3: ABBANDONA RUN
     const btnY3 = cy + 66;
-    const { bg: bg3, txt: txt3 } = createButton(this, cx, btnY3, 220, 40, '✕ ABBANDONA RUN', {
+    const { bg: bg3, txt: txt3 } = createButton(this, cx, btnY3, 220, 40, this._t('abbandonaRun'), {
       fill: 0x3a1515, hover: 0x551f1f, border: 0xe05555, borderWidth: 2,
       radius: 8, depth: 502, fontSize: '15px', font: FONT_UI, fontStyle: '700', letterSpacing: 2,
       onClick: () => this._showAbandonConfirm()
@@ -2481,7 +2723,7 @@ export class CombatScene extends Phaser.Scene {
     badge.lineStyle(1, 0xc9a84c, 1);
     badge.strokeRoundedRect(8, 56, 60, 20, 5);
     this._pauseGroup.push(badge);
-    const badgeTxt = this.add.text(38, 66, '⏸ PAUSA', {
+    const badgeTxt = this.add.text(38, 66, this._t('pausaBadge'), {
       fontFamily: FONT_UI, fontSize: '10px',
       color: '#' + (0xf0d880).toString(16).padStart(6, '0'),
       fontStyle: '700'
@@ -2516,21 +2758,21 @@ export class CombatScene extends Phaser.Scene {
     });
     confirmGroup.push(pnl);
 
-    const msg = this.add.text(cx, cy - 52, 'Abbandonare la run?', {
+    const msg = this.add.text(cx, cy - 52, this._t('abbandonareTitolo'), {
       fontFamily: FONT_TITLE, fontSize: '18px',
       color: '#' + (0xeaf0ff).toString(16).padStart(6, '0'),
       fontStyle: '700'
     }).setOrigin(0.5).setDepth(512);
     confirmGroup.push(msg);
 
-    const sub = this.add.text(cx, cy - 20, 'I progressi andranno persi.', {
+    const sub = this.add.text(cx, cy - 20, this._t('abbandonareSub'), {
       fontFamily: FONT_UI, fontSize: '12px',
       color: '#' + (0x7a89aa).toString(16).padStart(6, '0'),
     }).setOrigin(0.5).setDepth(512);
     confirmGroup.push(sub);
 
     // SÌ
-    const { bg: yBg, txt: yTxt } = createButton(this, cx - 65, cy + 38, 110, 38, 'SÌ', {
+    const { bg: yBg, txt: yTxt } = createButton(this, cx - 65, cy + 38, 110, 38, this._t('si'), {
       fill: 0x3a1515, hover: 0x551f1f, border: 0xe05555, borderWidth: 2,
       radius: 8, depth: 512, fontSize: '15px', font: FONT_UI, fontStyle: '700', letterSpacing: 2,
       onClick: () => {
@@ -2542,7 +2784,7 @@ export class CombatScene extends Phaser.Scene {
     confirmGroup.push(yBg, yTxt);
 
     // NO
-    const { bg: nBg, txt: nTxt } = createButton(this, cx + 65, cy + 38, 110, 38, 'NO', {
+    const { bg: nBg, txt: nTxt } = createButton(this, cx + 65, cy + 38, 110, 38, this._t('no'), {
       fill: 0x1a2540, hover: 0x253560, border: 0xc9a84c, borderWidth: 2,
       radius: 8, depth: 512, fontSize: '15px', font: FONT_UI, fontStyle: '700', letterSpacing: 2,
       onClick: () => {
@@ -2578,13 +2820,13 @@ export class CombatScene extends Phaser.Scene {
         .setDepth(300)
         .setAlpha(0);
 
-      const label = this.add.text(popupX, popupY - 8, '🏆 Achievement sbloccato!', {
+      const label = this.add.text(popupX, popupY - 8, this._t('achievementLabel'), {
         fontFamily: FONT_UI, fontSize: '11px',
         color: '#' + C.textGold.toString(16).padStart(6, '0'),
         fontStyle: '700'
       }).setOrigin(0.5).setDepth(301).setAlpha(0);
 
-      const nameText = this.add.text(popupX, popupY + 10, ach.name, {
+      const nameText = this.add.text(popupX, popupY + 10, LocaleManager.name(ach), {
         fontFamily: FONT_UI, fontSize: '13px',
         color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
         fontStyle: '700'

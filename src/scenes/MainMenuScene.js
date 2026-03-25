@@ -3,6 +3,42 @@ import { SaveManager } from '../managers/SaveManager.js';
 import { MusicManager } from '../managers/MusicManager.js';
 import { AscensionManager } from '../managers/AscensionManager.js';
 import { C, FONT_TITLE, FONT_UI, FONT_BODY, drawPanel, createButton, drawDivider } from '../ui/Theme.js';
+import { LocaleManager } from '../managers/LocaleManager.js';
+
+const T = {
+  it: {
+    subtitle:       'Un deckbuilder roguelike',
+    continua:       'CONTINUA',
+    nuovaPartita:   'NUOVA PARTITA',
+    sfidaGiorno:    '⚔️  SFIDA DEL GIORNO',
+    glossario:      'GLOSSARIO',
+    abilita:        'ABILITÀ',
+    statistiche:    'STATISTICHE',
+    impostazioni:   '⚙ IMPOSTAZIONI',
+    vittorie:       'Vittorie',
+    pianoMax:       'Piano max',
+    asc:            'Asc',
+    ascensione:     'Ascensione',
+    run:            'Run',
+    fattoConPhaser: 'Fatto con Phaser 3',
+  },
+  en: {
+    subtitle:       'A roguelike deckbuilder',
+    continua:       'CONTINUE',
+    nuovaPartita:   'NEW GAME',
+    sfidaGiorno:    '⚔️  DAILY CHALLENGE',
+    glossario:      'GLOSSARY',
+    abilita:        'ABILITIES',
+    statistiche:    'STATISTICS',
+    impostazioni:   '⚙ SETTINGS',
+    vittorie:       'Victories',
+    pianoMax:       'Max floor',
+    asc:            'Asc',
+    ascensione:     'Ascension',
+    run:            'Run',
+    fattoConPhaser: 'Made with Phaser 3',
+  },
+};
 
 /**
  * MainMenuScene — Redesign visivo con Theme.js
@@ -14,6 +50,8 @@ export class MainMenuScene extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale;
+    const lang = LocaleManager.getLang();
+    const t = k => (T[lang] || T.it)[k] ?? T.it[k];
 
     MusicManager.start(this, 0.28);
     this._transitioning = false;
@@ -70,7 +108,7 @@ export class MainMenuScene extends Phaser.Scene {
     });
 
     // Sottotitolo
-    this.add.text(width / 2, titleY + 58, 'Un deckbuilder roguelike', {
+    this.add.text(width / 2, titleY + 58, t('subtitle'), {
       fontFamily: FONT_UI,
       fontSize: '14px',
       color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
@@ -82,7 +120,7 @@ export class MainMenuScene extends Phaser.Scene {
     let btnY = height / 2 - 30;
 
     if (hasSave) {
-      createButton(this, width / 2, btnY, 270, 50, 'CONTINUA', {
+      createButton(this, width / 2, btnY, 270, 50, t('continua'), {
         fill: C.btnSuccess,
         hover: C.btnSuccessHov,
         border: C.skill,
@@ -101,7 +139,7 @@ export class MainMenuScene extends Phaser.Scene {
       btnY += 64;
     }
 
-    createButton(this, width / 2, btnY, 270, 50, 'NUOVA PARTITA', {
+    createButton(this, width / 2, btnY, 270, 50, t('nuovaPartita'), {
       fill: C.btnDanger,
       hover: C.btnDangerHov,
       border: C.attack,
@@ -112,7 +150,7 @@ export class MainMenuScene extends Phaser.Scene {
     });
     btnY += 64;
 
-    createButton(this, width / 2, btnY, 270, 44, '⚔️  SFIDA DEL GIORNO', {
+    createButton(this, width / 2, btnY, 270, 44, t('sfidaGiorno'), {
       fill: 0x2a1800,
       hover: 0x3d2200,
       border: C.rare,
@@ -129,7 +167,7 @@ export class MainMenuScene extends Phaser.Scene {
     const smallGap = 10;
     const rowX = width / 2;
 
-    createButton(this, rowX - smallW * 1.5 - smallGap * 1.5, btnY, smallW, smallH, 'GLOSSARIO', {
+    createButton(this, rowX - smallW * 1.5 - smallGap * 1.5, btnY, smallW, smallH, t('glossario'), {
       fill: C.btnPrimary,
       hover: C.btnHover,
       border: 0x5b9bd5,
@@ -139,7 +177,7 @@ export class MainMenuScene extends Phaser.Scene {
       onClick: () => this.scene.start('Glossary'),
     });
 
-    createButton(this, rowX - smallW * 0.5 - smallGap * 0.5, btnY, smallW, smallH, 'ABILITÀ', {
+    createButton(this, rowX - smallW * 0.5 - smallGap * 0.5, btnY, smallW, smallH, t('abilita'), {
       fill: C.btnPrimary,
       hover: C.btnHover,
       border: C.borderGold,
@@ -149,7 +187,7 @@ export class MainMenuScene extends Phaser.Scene {
       onClick: () => this._go('Perks', {}),
     });
 
-    createButton(this, rowX + smallW * 0.5 + smallGap * 0.5, btnY, smallW, smallH, 'STATISTICHE', {
+    createButton(this, rowX + smallW * 0.5 + smallGap * 0.5, btnY, smallW, smallH, t('statistiche'), {
       fill: C.btnPrimary,
       hover: C.btnHover,
       border: C.borderSubtle,
@@ -159,7 +197,7 @@ export class MainMenuScene extends Phaser.Scene {
       onClick: () => this.scene.start('Stats'),
     });
 
-    createButton(this, rowX + smallW * 1.5 + smallGap * 1.5, btnY, smallW, smallH, '⚙ IMPOSTAZIONI', {
+    createButton(this, rowX + smallW * 1.5 + smallGap * 1.5, btnY, smallW, smallH, t('impostazioni'), {
       fill: C.btnPrimary,
       hover: C.btnHover,
       border: C.borderGoldDim,
@@ -184,10 +222,10 @@ export class MainMenuScene extends Phaser.Scene {
 
     if (stats.totalRuns > 0) {
       const statsLine = [
-        `Run: ${stats.totalRuns}`,
-        `Vittorie: ${stats.victories}`,
-        `Piano max: ${stats.highestFloor + 1}`,
-        `Asc: ${ascLevel}`,
+        `${t('run')}: ${stats.totalRuns}`,
+        `${t('vittorie')}: ${stats.victories}`,
+        `${t('pianoMax')}: ${stats.highestFloor + 1}`,
+        `${t('asc')}: ${ascLevel}`,
       ].join('   |   ');
 
       this.add.text(width / 2, footerY, statsLine, {
@@ -196,13 +234,13 @@ export class MainMenuScene extends Phaser.Scene {
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       }).setOrigin(0.5);
     } else if (ascLevel > 0) {
-      this.add.text(width / 2, footerY, `Ascensione: ${ascLevel}`, {
+      this.add.text(width / 2, footerY, `${t('ascensione')}: ${ascLevel}`, {
         fontFamily: FONT_BODY,
         fontSize: '11px',
         color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
       }).setOrigin(0.5);
     } else {
-      this.add.text(width / 2, footerY, 'Fatto con Phaser 3', {
+      this.add.text(width / 2, footerY, t('fattoConPhaser'), {
         fontFamily: FONT_BODY,
         fontSize: '10px',
         color: '#' + C.borderSubtle.toString(16).padStart(6, '0'),
