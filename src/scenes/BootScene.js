@@ -32,6 +32,18 @@ export class BootScene extends Phaser.Scene {
     // Audio procedurale via Web Audio API — nessun file da caricare.
     // SoundManager è disponibile come singleton importabile da qualsiasi scena.
 
+    // Audio
+    this.load.audio('bg-music',        'assets/sounds/bg-music.mp3');
+    this.load.audio('attack-hit',      'assets/sounds/attack-hit.mp3');
+    this.load.audio('block',           'assets/sounds/block.mp3');
+    this.load.audio('card-play',       'assets/sounds/card-play.mp3');
+    this.load.audio('victory',         'assets/sounds/victory.mp3');
+    this.load.audio('defeat',          'assets/sounds/defeat.mp3');
+    this.load.audio('relic-pickup',    'assets/sounds/relic-pickup.mp3');
+    this.load.audio('heal',            'assets/sounds/heal.mp3');
+    this.load.audio('menu-click',      'assets/sounds/menu-click.mp3');
+    this.load.audio('phase-transition','assets/sounds/phase-transition.mp3');
+
     // Dungeon backgrounds
     ['bg-menu', 'bg-map', 'bg-combat', 'bg-combat-elite', 'bg-combat-boss',
      'bg-reward', 'bg-classselect', 'bg-secondary'].forEach(key => {
@@ -105,6 +117,15 @@ export class BootScene extends Phaser.Scene {
   create() {
     // Rende SoundManager accessibile tramite Phaser registry (opzionale)
     this.game.registry.set('soundManager', SoundManager);
+
+    // Resume AudioContext al primo click (browser autoplay policy)
+    const resumeCtx = () => {
+      SoundManager.getContext();
+      document.removeEventListener('click', resumeCtx);
+      document.removeEventListener('keydown', resumeCtx);
+    };
+    document.addEventListener('click', resumeCtx);
+    document.addEventListener('keydown', resumeCtx);
     this.createCardTextures();
 
     // Cursore personalizzato dorato
