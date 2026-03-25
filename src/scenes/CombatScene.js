@@ -183,7 +183,7 @@ const T = {
     inPausa:          'PAUSED',
     riprendi:         '▶ RESUME',
     impostazioni:     '⚙ SETTINGS',
-    abbandonaRun:     '✕ ABANDON RUN',
+    abbandonaRun:     '✕ QUIT RUN',
     pausaBadge:       '⏸ PAUSE',
     // Abandon confirm
     abbandonareTitolo: 'Abandon the run?',

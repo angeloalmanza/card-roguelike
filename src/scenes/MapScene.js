@@ -113,6 +113,15 @@ const T = {
     tutStart: "INIZIA L'AVVENTURA",
     tutNext: 'AVANTI \u2192',
     tutSkip: 'SALTA',
+    // Pausa
+    inPausa: 'IN PAUSA',
+    riprendi: '▶ RIPRENDI',
+    impostazioni: '⚙ IMPOSTAZIONI',
+    abbandonaRun: '✕ ABBANDONA RUN',
+    abbandonareTitolo: 'Abbandonare la run?',
+    abbandonareSub: 'I progressi andranno persi.',
+    si: 'SÌ',
+    no: 'NO',
     // Currency word (for price displays)
     goldWord: 'oro',
     // Enemy tooltip
@@ -223,6 +232,15 @@ const T = {
     tutStart: 'START THE ADVENTURE',
     tutNext: 'NEXT \u2192',
     tutSkip: 'SKIP',
+    // Pausa
+    inPausa: 'IN PAUSA',
+    riprendi: '▶ RESUME',
+    impostazioni: '⚙ SETTINGS',
+    abbandonaRun: '✕ QUIT RUN',
+    abbandonareTitolo: 'Quit the run?',
+    abbandonareSub: 'Your progress will be lost.',
+    si: 'YES',
+    no: 'NO',
     // Currency word (for price displays)
     goldWord: 'gold',
     // Enemy tooltip
@@ -337,9 +355,22 @@ export class MapScene extends Phaser.Scene {
       fontFamily: FONT_TITLE, fontSize: '16px', color: '#c9a84c', fontStyle: '700', letterSpacing: 4
     }).setOrigin(0.5).setDepth(51);
 
-    this.add.text(width - 20, 22, `${this.runData.gold} ${this._t('gold')}`, {
+    this.add.text(width - 60, 22, `${this.runData.gold} ${this._t('gold')}`, {
       fontFamily: F, fontSize: '13px', color: '#c9a84c', fontStyle: '700'
     }).setOrigin(1, 0.5).setDepth(51);
+
+    // Bottone pausa
+    this._mapPaused = false;
+    this._mapPauseGroup = [];
+    const mapPauseBg = this.add.rectangle(width - 28, 22, 34, 26, C.bgPanel, 0.9)
+      .setStrokeStyle(1, C.borderGoldDim).setDepth(51).setInteractive({ useHandCursor: true });
+    this.add.text(width - 28, 22, '⏸', { fontSize: '13px' }).setOrigin(0.5).setDepth(52);
+    mapPauseBg.on('pointerover', () => mapPauseBg.setStrokeStyle(1, C.borderGold));
+    mapPauseBg.on('pointerout',  () => mapPauseBg.setStrokeStyle(1, C.borderGoldDim));
+    mapPauseBg.on('pointerup',   () => this._openMapPause());
+    this.input.keyboard.on('keydown-ESC', () => {
+      if (this._mapPaused) this._closeMapPause(); else this._openMapPause();
+    });
 
     // Riga 2 (y=52): reliquie sinistra, pozioni centro-sinistra, bottone MAZZO destra
     const relics = this.runData.relics || [];
@@ -2626,5 +2657,100 @@ export class MapScene extends Phaser.Scene {
     };
 
     render();
+  }
+
+  // ── Menu pausa mappa ──────────────────────────────────────────────────────
+  _openMapPause() {
+    if (this._mapPaused) return;
+    this._mapPaused = true;
+    const { width, height } = this.scale;
+    const cx = width / 2, cy = height / 2;
+
+    const overlay = this.add.rectangle(cx, cy, width, height, 0x000000, 0.7)
+      .setDepth(500).setInteractive();
+    this._mapPauseGroup.push(overlay);
+
+    const panel = drawPanel(this, cx, cy, 380, 260, {
+      radius: 14, fill: 0x111520, border: 0xc9a84c, borderWidth: 2, depth: 501
+    });
+    this._mapPauseGroup.push(panel);
+
+    const title = this.add.text(cx, cy - 95, this._t('inPausa'), {
+      fontFamily: FONT_TITLE, fontSize: '28px',
+      color: '#f0d880', fontStyle: '700'
+    }).setOrigin(0.5).setDepth(502);
+    this._mapPauseGroup.push(title);
+
+    const { bg: bg1, txt: txt1 } = createButton(this, cx, cy - 30, 220, 40, this._t('riprendi'), {
+      fill: 0x1a2540, hover: 0x253560, border: 0xc9a84c, borderWidth: 2,
+      radius: 8, depth: 502, fontSize: '15px', font: FONT_UI, letterSpacing: 2,
+      onClick: () => this._closeMapPause()
+    });
+    this._mapPauseGroup.push(bg1, txt1);
+
+    const { bg: bg2, txt: txt2 } = createButton(this, cx, cy + 22, 220, 40, this._t('impostazioni'), {
+      fill: 0x1a2540, hover: 0x253560, border: 0xc9a84c, borderWidth: 2,
+      radius: 8, depth: 502, fontSize: '15px', font: FONT_UI, letterSpacing: 2,
+      onClick: () => { this.scene.launch('Settings'); this.scene.pause(); }
+    });
+    this._mapPauseGroup.push(bg2, txt2);
+
+    const { bg: bg3, txt: txt3 } = createButton(this, cx, cy + 74, 220, 40, this._t('abbandonaRun'), {
+      fill: 0x3a1515, hover: 0x551f1f, border: 0xe05555, borderWidth: 2,
+      radius: 8, depth: 502, fontSize: '15px', font: FONT_UI, letterSpacing: 2,
+      onClick: () => this._showMapAbandonConfirm()
+    });
+    this._mapPauseGroup.push(bg3, txt3);
+  }
+
+  _closeMapPause() {
+    this._mapPaused = false;
+    this._mapPauseGroup.forEach(o => o?.destroy());
+    this._mapPauseGroup = [];
+  }
+
+  _showMapAbandonConfirm() {
+    this._mapPauseGroup.forEach(o => o?.destroy());
+    this._mapPauseGroup = [];
+    const { width, height } = this.scale;
+    const cx = width / 2, cy = height / 2;
+
+    const overlay = this.add.rectangle(cx, cy, width, height, 0x000000, 0.7)
+      .setDepth(500).setInteractive();
+    this._mapPauseGroup.push(overlay);
+
+    const panel = drawPanel(this, cx, cy, 340, 200, {
+      radius: 14, fill: 0x111520, border: 0xe05555, borderWidth: 2, depth: 501
+    });
+    this._mapPauseGroup.push(panel);
+
+    this._mapPauseGroup.push(
+      this.add.text(cx, cy - 60, this._t('abbandonareTitolo'), {
+        fontFamily: FONT_TITLE, fontSize: '20px', color: '#e05555', fontStyle: '700'
+      }).setOrigin(0.5).setDepth(502)
+    );
+    this._mapPauseGroup.push(
+      this.add.text(cx, cy - 28, this._t('abbandonareSub'), {
+        fontFamily: FONT_UI, fontSize: '12px', color: '#aaa'
+      }).setOrigin(0.5).setDepth(502)
+    );
+
+    const { bg: bgY, txt: txtY } = createButton(this, cx - 70, cy + 30, 110, 38, this._t('si'), {
+      fill: 0x3a1515, hover: 0x551f1f, border: 0xe05555, borderWidth: 2,
+      radius: 8, depth: 502, fontSize: '15px', font: FONT_UI,
+      onClick: () => {
+        SaveManager.clearRun();
+        this.cameras.main.fadeOut(300, 0, 0, 0);
+        this.cameras.main.once('camerafadeoutcomplete', () => this.scene.start('MainMenu'));
+      }
+    });
+    this._mapPauseGroup.push(bgY, txtY);
+
+    const { bg: bgN, txt: txtN } = createButton(this, cx + 70, cy + 30, 110, 38, this._t('no'), {
+      fill: 0x1a2540, hover: 0x253560, border: 0xc9a84c, borderWidth: 2,
+      radius: 8, depth: 502, fontSize: '15px', font: FONT_UI,
+      onClick: () => this._closeMapPause()
+    });
+    this._mapPauseGroup.push(bgN, txtN);
   }
 }
