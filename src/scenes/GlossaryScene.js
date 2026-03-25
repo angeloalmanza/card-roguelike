@@ -479,8 +479,11 @@ export class GlossaryScene extends Phaser.Scene {
       return;
     }
 
+    const relicKey = `relic-${relic.id}`;
     this.contentContainer.add(
-      this.add.text(x + 28, y + h / 2, relic.emoji, { fontSize: '24px' }).setOrigin(0.5)
+      this.textures.exists(relicKey)
+        ? this.add.image(x + 28, y + h / 2, relicKey).setDisplaySize(28, 28).setOrigin(0.5)
+        : this.add.text(x + 28, y + h / 2, relic.emoji, { fontSize: '24px' }).setOrigin(0.5)
     );
 
     this.contentContainer.add(

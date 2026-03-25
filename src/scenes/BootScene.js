@@ -71,6 +71,24 @@ export class BootScene extends Phaser.Scene {
     this.load.image('icon-broken', 'assets/icons/icon-broken.png');
     this.load.image('icon-luck',   'assets/icons/icon-luck.png');
 
+    // Relic icons
+    ['ironRing','redPotion','whetstone','shield','boots','healingHerb','poisonRing',
+     'ironWill','luckyCharm','warHorn','energyCrystal','vampireFang','thornArmor',
+     'warDrum','frostArmor','bloodPact','venomFang','battleScarred','energyOrb',
+     'crown','demonHeart','infinityGauntlet','dragonScale','ancientTome',
+     'berserkerHeart','fireAmulet','healingStone','thunderMask','poisonVial',
+     'hunterTooth','bloodGem','warTrophy','killStreak','warriorCrest',
+     'berserkerRage','shadowCloak','poisonedBlade','alchemistFlask','explosiveMixture',
+    ].forEach(id => {
+      this.load.image(`relic-${id}`, `assets/relics/${id}.png`);
+    });
+
+    // Potion icons
+    this.load.image('potion-health',   'assets/potions/potion-red.png');
+    this.load.image('potion-block',    'assets/potions/potion-blue.png');
+    this.load.image('potion-strength', 'assets/potions/potion-yellow.png');
+    this.load.image('potion-energy',   'assets/potions/potion-green.png');
+
     // Enemy sprites (pixel art portraits)
     [
       'enemy-slime', 'enemy-skeleton', 'enemy-goblin', 'enemy-bat',

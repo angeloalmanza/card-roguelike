@@ -246,11 +246,18 @@ export class ClassSelectionScene extends Phaser.Scene {
     // Reliquia
     const relic = RELICS[cls.starterRelicId];
     if (relic) {
-      this.add.text(cx, topY + bandH + 70, `${relic.emoji} ${LocaleManager.name(relic)}`, {
-        fontFamily: FONT_UI, fontSize: '11px',
-        color: unlocked ? '#' + C.textGold.toString(16).padStart(6, '0') : '#' + C.borderSubtle.toString(16).padStart(6, '0'),
-        fontStyle: '700',
-      }).setOrigin(0.5);
+      const relicColor = unlocked ? '#' + C.textGold.toString(16).padStart(6, '0') : '#' + C.borderSubtle.toString(16).padStart(6, '0');
+      const relicKey = `relic-${relic.id}`;
+      if (this.textures.exists(relicKey)) {
+        this.add.image(cx - 36, topY + bandH + 70, relicKey).setDisplaySize(14, 14).setOrigin(0.5);
+        this.add.text(cx - 26, topY + bandH + 70, LocaleManager.name(relic), {
+          fontFamily: FONT_UI, fontSize: '11px', color: relicColor, fontStyle: '700',
+        }).setOrigin(0, 0.5);
+      } else {
+        this.add.text(cx, topY + bandH + 70, `${relic.emoji} ${LocaleManager.name(relic)}`, {
+          fontFamily: FONT_UI, fontSize: '11px', color: relicColor, fontStyle: '700',
+        }).setOrigin(0.5);
+      }
     }
 
     // Separatore 2

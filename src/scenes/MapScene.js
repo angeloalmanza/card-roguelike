@@ -348,7 +348,12 @@ export class MapScene extends Phaser.Scene {
       const ry = 52;
       const bg = this.add.circle(rx, ry, 10, C.bgPanelDark, 0.9)
         .setStrokeStyle(1.5, C.borderGoldDim).setDepth(51).setInteractive({ useHandCursor: true });
-      this.add.text(rx, ry, relic.emoji, { fontSize: '11px' }).setOrigin(0.5).setDepth(52);
+      const relicKey = `relic-${relic.id}`;
+      if (this.textures.exists(relicKey)) {
+        this.add.image(rx, ry, relicKey).setDisplaySize(16, 16).setOrigin(0.5).setDepth(52);
+      } else {
+        this.add.text(rx, ry, relic.emoji, { fontSize: '11px' }).setOrigin(0.5).setDepth(52);
+      }
 
       let tooltipBg, tooltipText;
       bg.on('pointerover', () => {

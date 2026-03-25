@@ -644,11 +644,13 @@ export class CombatScene extends Phaser.Scene {
         .setStrokeStyle(1.5, C.mana)
         .setInteractive({ useHandCursor: true })
         .setDepth(71);
-      const emoji = this.add.text(x, barY, potion.emoji, { fontSize: '14px' })
-        .setOrigin(0.5).setDepth(72);
+      const potionKey = `potion-${potion.id}`;
+      const potionIcon = this.textures.exists(potionKey)
+        ? this.add.image(x, barY, potionKey).setDisplaySize(22, 22).setOrigin(0.5).setDepth(72)
+        : this.add.text(x, barY, potion.emoji, { fontSize: '14px' }).setOrigin(0.5).setDepth(72);
 
       this.potionGroup.add(bg);
-      this.potionGroup.add(emoji);
+      this.potionGroup.add(potionIcon);
 
       bg.on('pointerover', () => {
         bg.setStrokeStyle(1.5, C.borderGold);
@@ -713,7 +715,12 @@ export class CombatScene extends Phaser.Scene {
       const bg = this.add.circle(x, y, 14, C.bgPanel, 0.9)
         .setStrokeStyle(1.5, strokeColor)
         .setInteractive({ useHandCursor: isActivatable }).setDepth(71);
-      this.add.text(x, y, relic.emoji, { fontSize: '13px' }).setOrigin(0.5).setDepth(72);
+      const relicKey = `relic-${relic.id}`;
+      if (this.textures.exists(relicKey)) {
+        this.add.image(x, y, relicKey).setDisplaySize(20, 20).setOrigin(0.5).setDepth(72);
+      } else {
+        this.add.text(x, y, relic.emoji, { fontSize: '13px' }).setOrigin(0.5).setDepth(72);
+      }
 
       this.relicBgs[relic.id] = bg;
 

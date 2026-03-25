@@ -176,10 +176,13 @@ export class RewardScene extends Phaser.Scene {
       borderWidth: 2,
     });
 
-    // Emoji reliquia
-    this.add.text(width / 2 - boxW / 2 + 42, y, relic.emoji, {
-      fontSize: '28px',
-    }).setOrigin(0.5);
+    // Icona reliquia
+    const relicKey = `relic-${relic.id}`;
+    if (this.textures.exists(relicKey)) {
+      this.add.image(width / 2 - boxW / 2 + 42, y, relicKey).setDisplaySize(36, 36).setOrigin(0.5);
+    } else {
+      this.add.text(width / 2 - boxW / 2 + 42, y, relic.emoji, { fontSize: '28px' }).setOrigin(0.5);
+    }
 
     // Nome
     this.add.text(width / 2 - boxW / 2 + 90, y - 14, this._t('relicLabel')(LocaleManager.name(relic)), {
