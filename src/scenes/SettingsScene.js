@@ -79,7 +79,6 @@ export class SettingsScene extends Phaser.Scene {
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'), letterSpacing: 4,
     }).setOrigin(0.5).setDepth(2);
 
-    drawDivider(this, cx, titleY + 26, panW - 40, { color: C.borderGold, alpha: 0.6, depth: 2 });
 
     const startY = titleY + 52;
     let curY = startY;

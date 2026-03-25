@@ -56,12 +56,10 @@ export class CardSprite extends Phaser.GameObjects.Container {
     }).setOrigin(0.5);
     this.add(nameText);
 
-    // ── Icona tipo (emoji, zona centrale) ────────────────────────────────
-    const typeIcons = { attack: '⚔️', defend: '🛡️', skill: '✨', curse: '☠️' };
-    const iconText = scene.add.text(0, -H / 2 + 60, typeIcons[cardType] || '✨', {
-      fontSize: '22px',
-    }).setOrigin(0.5);
-    this.add(iconText);
+    // ── Icona tipo (PNG dark RPG) ─────────────────────────────────────────
+    const typeIcon = scene.add.image(0, -H / 2 + 62, `icon-${cardType}`)
+      .setDisplaySize(52, 52);
+    this.add(typeIcon);
 
     // ── Valore grande ─────────────────────────────────────────────────────
     const valueDisplay = isCurse ? '☠' : String(cardData.value);

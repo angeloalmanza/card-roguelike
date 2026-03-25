@@ -102,8 +102,6 @@ export class PerkScene extends Phaser.Scene {
     }).setOrigin(1, 0.5);
     this._refreshPointsText();
 
-    drawDivider(this, width / 2, 96, width - 80, { color: C.borderSubtle, alpha: 0.5 });
-
     // ── Livello 1 ─────────────────────────────────────────────────────────────
     this._drawLevelLabel(width / 2, 110, t('livello')(1));
     this._drawLevel(1, PERK_DEFINITIONS.filter(p => p.level === 1), 128, t);

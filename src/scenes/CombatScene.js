@@ -869,14 +869,14 @@ export class CombatScene extends Phaser.Scene {
   createSlancioUI() {
     const y = 24;
     const x = 450;
-    this.slancioBg = this.add.rectangle(x, y, 82, 28, 0x2a0f0f, 0.9)
+    this.slancioBg = this.add.rectangle(x, y, 90, 30, 0x2a0f0f, 0.9)
       .setStrokeStyle(1, C.bgPanelDark).setDepth(71).setAlpha(0)
       .setInteractive({ useHandCursor: false });
-    this.slancioLabel = this.add.text(x - 28, y, this._t('slancioLabel'), {
+    this.slancioLabel = this.add.text(x, y - 7, this._t('slancioLabel'), {
       fontFamily: F, fontSize: '7px', color: '#e85d5d', fontStyle: '700', letterSpacing: 1
-    }).setOrigin(0, 0.5).setDepth(72).setAlpha(0);
-    this.slancioText = this.add.text(x + 22, y, '', {
-      fontFamily: F, fontSize: '15px', color: '#e85d5d', fontStyle: '900'
+    }).setOrigin(0.5, 0.5).setDepth(72).setAlpha(0);
+    this.slancioText = this.add.text(x, y + 6, '', {
+      fontFamily: F, fontSize: '13px', color: '#e85d5d', fontStyle: '900'
     }).setOrigin(0.5, 0.5).setDepth(72).setAlpha(0);
 
     this.slancioBg.on('pointerover', () => {
@@ -1219,11 +1219,13 @@ export class CombatScene extends Phaser.Scene {
 
     this.statusPoisonBg   = this.add.rectangle(panelX - 56, sy, 54, 20, C.curseDark, 0.9)
       .setStrokeStyle(1, C.curse).setDepth(4);
-    this.statusPoisonText = this.add.text(panelX - 56, sy, '', {
+    this.statusPoisonIcon = this.add.image(panelX - 69, sy, 'icon-poison')
+      .setDisplaySize(14, 14).setDepth(5);
+    this.statusPoisonText = this.add.text(panelX - 50, sy, '', {
       fontFamily: FONT_UI, fontSize: '12px',
       color: '#' + C.curse.toString(16).padStart(6, '0'),
       fontStyle: '700', stroke: '#000000', strokeThickness: 2
-    }).setOrigin(0.5).setDepth(5);
+    }).setOrigin(0, 0.5).setDepth(5);
 
     this.statusBurnBg   = this.add.rectangle(panelX + 4, sy, 54, 20, 0x3d1000, 0.9)
       .setStrokeStyle(1, C.burn).setDepth(4);
@@ -1251,6 +1253,7 @@ export class CombatScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(5);
 
     [this.statusPoisonBg, this.statusBurnBg, this.statusStunBg, this.statusWeaknessBg].forEach(bg => bg.setVisible(false));
+    this.statusPoisonIcon.setVisible(false);
 
     this.enemyCenter = { x: panelX, y: panelY };
     this.enemyBounds = new Phaser.Geom.Rectangle(panelX - 250, panelY - 100, 500, 200);
@@ -1271,9 +1274,8 @@ export class CombatScene extends Phaser.Scene {
     const hpBarH = 18;
 
     // Label HP a sinistra
-    this.add.text(width / 2 - hpBarW / 2 - 8, playerY, '❤', {
-      fontSize: '14px'
-    }).setOrigin(1, 0.5).setDepth(60);
+    this.add.image(width / 2 - hpBarW / 2 - 8, playerY, 'icon-heart')
+      .setDisplaySize(22, 22).setOrigin(1, 0.5).setDepth(60);
 
     // Sfondo barra HP (arrotondata)
     const hpBgGfx = this.add.graphics().setDepth(59);
@@ -1294,6 +1296,8 @@ export class CombatScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(61);
 
     // BLK badge blu a sinistra della barra
+    this.playerBlockIcon = this.add.image(width / 2 - hpBarW / 2 - 64, playerY, 'icon-defend')
+      .setDisplaySize(20, 20).setOrigin(0.5).setDepth(60).setVisible(false);
     this.playerBlockText = this.add.text(width / 2 - hpBarW / 2 - 50, playerY, '', {
       fontFamily: FONT_UI, fontSize: '13px',
       color: '#' + C.mana.toString(16).padStart(6, '0'),
@@ -1301,6 +1305,8 @@ export class CombatScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(60);
 
     // STR badge dorato a destra della barra
+    this.playerStrengthIcon = this.add.image(width / 2 + hpBarW / 2 + 36, playerY, 'icon-might')
+      .setDisplaySize(20, 20).setOrigin(0.5).setDepth(60).setVisible(false);
     this.playerStrengthText = this.add.text(width / 2 + hpBarW / 2 + 50, playerY, '', {
       fontFamily: FONT_UI, fontSize: '13px',
       color: '#' + C.textGold.toString(16).padStart(6, '0'),
@@ -1312,11 +1318,13 @@ export class CombatScene extends Phaser.Scene {
 
     this.playerStatusPoisonBg   = this.add.rectangle(width / 2 - 36, psy, 54, 18, C.curseDark, 0.9)
       .setStrokeStyle(1, C.curse).setDepth(61);
-    this.playerStatusPoisonText = this.add.text(width / 2 - 36, psy, '', {
+    this.playerStatusPoisonIcon = this.add.image(width / 2 - 49, psy, 'icon-poison')
+      .setDisplaySize(13, 13).setDepth(62);
+    this.playerStatusPoisonText = this.add.text(width / 2 - 30, psy, '', {
       fontFamily: FONT_UI, fontSize: '11px',
       color: '#' + C.curse.toString(16).padStart(6, '0'),
       fontStyle: '700', stroke: '#000000', strokeThickness: 2
-    }).setOrigin(0.5).setDepth(62);
+    }).setOrigin(0, 0.5).setDepth(62);
 
     this.playerStatusBurnBg   = this.add.rectangle(width / 2 + 28, psy, 54, 18, 0x3d1000, 0.9)
       .setStrokeStyle(1, C.burn).setDepth(61);
@@ -1336,6 +1344,7 @@ export class CombatScene extends Phaser.Scene {
     }).setOrigin(0.5).setDepth(62);
 
     [this.playerStatusPoisonBg, this.playerStatusBurnBg, this.playerArmorBg].forEach(bg => bg.setVisible(false));
+    this.playerStatusPoisonIcon.setVisible(false);
 
     this.updatePlayerUI();
   }
@@ -1355,8 +1364,10 @@ export class CombatScene extends Phaser.Scene {
     else this.playerHpBar.setFillStyle(C.hp);
 
     this.playerHpText.setText(`${player.hp} / ${player.maxHp}`);
-    this.playerBlockText.setText(player.block > 0 ? `🛡 ${player.block}` : '');
-    this.playerStrengthText.setText(player.strength > 0 ? `⚔ +${player.strength}` : '');
+    this.playerBlockIcon.setVisible(player.block > 0);
+    this.playerBlockText.setText(player.block > 0 ? String(player.block) : '');
+    this.playerStrengthIcon.setVisible(player.strength > 0);
+    this.playerStrengthText.setText(player.strength > 0 ? `+${player.strength}` : '');
   }
 
   updateEnemyUI() {
@@ -1411,7 +1422,8 @@ export class CombatScene extends Phaser.Scene {
     const se = this.enemy.statusEffects;
 
     this.statusPoisonBg.setVisible(se.poison > 0);
-    this.statusPoisonText.setText(se.poison > 0 ? `☠ ${se.poison}` : '');
+    this.statusPoisonIcon.setVisible(se.poison > 0);
+    this.statusPoisonText.setText(se.poison > 0 ? String(se.poison) : '');
 
     this.statusBurnBg.setVisible(se.burn > 0);
     this.statusBurnText.setText(se.burn > 0 ? `🔥 ${se.burn}` : '');
@@ -1430,7 +1442,8 @@ export class CombatScene extends Phaser.Scene {
     const pse = this.player.statusEffects;
     if (this.playerStatusPoisonText) {
       this.playerStatusPoisonBg.setVisible(pse.poison > 0);
-      this.playerStatusPoisonText.setText(pse.poison > 0 ? `☠ ${pse.poison}` : '');
+      this.playerStatusPoisonIcon.setVisible(pse.poison > 0);
+      this.playerStatusPoisonText.setText(pse.poison > 0 ? String(pse.poison) : '');
     }
     if (this.playerStatusBurnText) {
       this.playerStatusBurnBg.setVisible(pse.burn > 0);

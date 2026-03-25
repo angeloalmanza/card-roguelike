@@ -42,6 +42,29 @@ export class BootScene extends Phaser.Scene {
     });
     this.load.image('card-banner', 'assets/cards/banner.png');
 
+    // Card type icons (dark RPG style)
+    this.load.image('icon-attack', 'assets/icons/icon-attack.png');
+    this.load.image('icon-defend', 'assets/icons/icon-defend.png');
+    this.load.image('icon-skill',  'assets/icons/icon-skill.png');
+    this.load.image('icon-curse',  'assets/icons/icon-curse.png');
+
+    // Map node icons
+    this.load.image('node-combat', 'assets/icons/node-combat.png');
+    this.load.image('node-elite',  'assets/icons/node-elite.png');
+    this.load.image('node-boss',   'assets/icons/node-boss.png');
+    this.load.image('node-event',  'assets/icons/node-event.png');
+    this.load.image('node-shop',   'assets/icons/node-shop.png');
+    this.load.image('node-rest',   'assets/icons/node-rest.png');
+
+    // HUD icons
+    this.load.image('icon-heart',  'assets/icons/icon-heart.png');
+    this.load.image('icon-gold',   'assets/icons/icon-gold.png');
+    this.load.image('icon-might',  'assets/icons/icon-might.png');
+    this.load.image('icon-poison', 'assets/icons/icon-poison.png');
+    this.load.image('icon-potion', 'assets/icons/icon-potion.png');
+    this.load.image('icon-broken', 'assets/icons/icon-broken.png');
+    this.load.image('icon-luck',   'assets/icons/icon-luck.png');
+
     // Enemy sprites (SVG)
     const enemyFiles = [
       ['enemy-slime', 'slime'],
@@ -65,8 +88,6 @@ export class BootScene extends Phaser.Scene {
     // Rende SoundManager accessibile tramite Phaser registry (opzionale)
     this.game.registry.set('soundManager', SoundManager);
     this.createCardTextures();
-    this.createCardIcons();
-    this.createNodeIcons();
 
     // Cursore personalizzato dorato
     const cur = document.createElement('canvas');

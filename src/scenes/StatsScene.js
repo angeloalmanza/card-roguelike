@@ -111,8 +111,6 @@ export class StatsScene extends Phaser.Scene {
       letterSpacing: 4,
     }).setOrigin(0.5);
 
-    // Divider sotto header
-    drawDivider(this, width / 2, 65, width, { color: C.borderGold, alpha: 0.4 });
   }
 
   // ----------------------------------------------------------------
@@ -214,15 +212,15 @@ export class StatsScene extends Phaser.Scene {
 
     const t = this._t;
     const entries = [
-      { icon: '⚔️',  label: t('runTotali'),        value: stats.totalRuns },
-      { icon: '🏆',  label: t('vittorie'),          value: stats.victories },
-      { icon: '💀',  label: t('sconfitte'),         value: stats.defeats },
-      { icon: '📊',  label: t('tassoVittoria'),     value: stats.totalRuns > 0 ? Math.round((stats.victories / stats.totalRuns) * 100) + '%' : '-' },
-      { icon: '🗺️',  label: t('pianoMassimo'),      value: stats.highestFloor + 1 },
-      { icon: '💀',  label: t('nemiciSconfitti'),   value: stats.enemiesKilled },
-      { icon: '💰',  label: t('oroGuadagnato'),     value: stats.goldEarned },
-      { icon: '🃏',  label: t('carteScope'),        value: `${collection.cards.length}` },
-      { icon: '🔮',  label: t('reliquieScope'),     value: `${collection.relics.length}` },
+      { iconKey: 'icon-attack', label: t('runTotali'),        value: stats.totalRuns },
+      { emoji: '🏆',            label: t('vittorie'),          value: stats.victories },
+      { iconKey: 'icon-curse',  label: t('sconfitte'),         value: stats.defeats },
+      { emoji: '📊',            label: t('tassoVittoria'),     value: stats.totalRuns > 0 ? Math.round((stats.victories / stats.totalRuns) * 100) + '%' : '-' },
+      { emoji: '🗺️',            label: t('pianoMassimo'),      value: stats.highestFloor + 1 },
+      { iconKey: 'icon-curse',  label: t('nemiciSconfitti'),   value: stats.enemiesKilled },
+      { iconKey: 'icon-gold',   label: t('oroGuadagnato'),     value: stats.goldEarned },
+      { iconKey: 'icon-attack', label: t('carteScope'),        value: `${collection.cards.length}` },
+      { iconKey: 'icon-luck',   label: t('reliquieScope'),     value: `${collection.relics.length}` },
     ];
 
     const startY = 115;
@@ -250,11 +248,18 @@ export class StatsScene extends Phaser.Scene {
         container.add(rowG);
       }
 
-      container.add(this.add.text(leftX, y, `${entry.icon}  ${entry.label}`, {
-        fontFamily: FONT_UI,
-        fontSize: '15px',
-        color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
-      }).setOrigin(0, 0.5));
+      if (entry.iconKey) {
+        container.add(this.add.image(leftX - 4, y, entry.iconKey).setDisplaySize(22, 22).setOrigin(1, 0.5));
+        container.add(this.add.text(leftX + 6, y, entry.label, {
+          fontFamily: FONT_UI, fontSize: '15px',
+          color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
+        }).setOrigin(0, 0.5));
+      } else {
+        container.add(this.add.text(leftX, y, `${entry.emoji}  ${entry.label}`, {
+          fontFamily: FONT_UI, fontSize: '15px',
+          color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
+        }).setOrigin(0, 0.5));
+      }
 
       container.add(this.add.text(rightX, y, String(entry.value), {
         fontFamily: FONT_TITLE,
@@ -324,7 +329,8 @@ export class StatsScene extends Phaser.Scene {
           color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
         }).setOrigin(0, 0.5));
 
-        container.add(this.add.text(width / 2 + 20, y, `${run.gold} 💰`, {
+        container.add(this.add.image(width / 2 + 20, y, 'icon-gold').setDisplaySize(18, 18).setOrigin(0, 0.5));
+        container.add(this.add.text(width / 2 + 42, y, String(run.gold), {
           fontFamily: FONT_UI, fontSize: '13px',
           color: '#' + C.textGold.toString(16).padStart(6, '0'),
         }).setOrigin(0, 0.5));

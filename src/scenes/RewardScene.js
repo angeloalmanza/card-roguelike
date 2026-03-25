@@ -279,7 +279,7 @@ export class RewardScene extends Phaser.Scene {
 
       // Icona tipo
       const iconKey = `icon-${card.type}`;
-      const iconImg = this.add.image(0, -72, iconKey).setScale(1.2);
+      const iconImg = this.add.image(0, -72, iconKey).setDisplaySize(60, 60);
 
       // Cerchio costo
       const typeColorsHex = { attack: C.attack, defend: C.defend, skill: C.skill, curse: C.curse };

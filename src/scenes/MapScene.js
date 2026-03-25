@@ -604,8 +604,9 @@ export class MapScene extends Phaser.Scene {
           this.mapContainer.add(marker);
         }
 
-        const icon = this.add.image(x, y, style.icon).setAlpha(alpha);
-        if (node.type === 'boss') icon.setScale(1.3);
+        const iconSize = node.type === 'boss' ? 42 : 32;
+        const icon = this.add.image(x, y, style.icon)
+          .setDisplaySize(iconSize, iconSize).setAlpha(alpha);
         this.mapContainer.add(icon);
 
         if (node.completed) {
@@ -618,45 +619,17 @@ export class MapScene extends Phaser.Scene {
         if (isAccessible && !node.completed) {
           circle.setInteractive({ useHandCursor: true });
 
-          let enemyTooltipBg = null;
-          let enemyTooltipText = null;
-
           circle.on('pointerover', () => {
             circle.setStrokeStyle(2.5, 0xe8b84b);
             this.tooltip.setText(style.label);
-
-            // Mostra tooltip nemico per nodi combat ed elite
-            if (node.type === 'combat' || node.type === 'elite') {
-              const info = this._getEnemyTooltipInfo(node.type, f);
-              if (info) {
-                const { width } = this.scale;
-                const tooltipW = 200;
-                const tooltipH = 68;
-                const rawTx = x + this.mapContainer.x;
-                const rawTy = y + this.mapContainer.y;
-                // Posiziona il tooltip vicino al nodo, evitando i bordi
-                const tx = Phaser.Math.Clamp(rawTx, tooltipW / 2 + 10, width - tooltipW / 2 - 10);
-                const ty = rawTy - radius - tooltipH / 2 - 8;
-                enemyTooltipBg = this.add.rectangle(tx, ty, tooltipW, tooltipH, 0x1a1a22, 0.97)
-                  .setStrokeStyle(1.5, style.color).setDepth(300);
-                enemyTooltipText = this.add.text(tx, ty, info, {
-                  fontFamily: F, fontSize: '10px', color: '#e2e2e6',
-                  align: 'center', wordWrap: { width: tooltipW - 16 }
-                }).setOrigin(0.5).setDepth(301);
-              }
-            }
           });
 
           circle.on('pointerout', () => {
             circle.setStrokeStyle(2, style.color);
             this.tooltip.setText('');
-            if (enemyTooltipBg) { enemyTooltipBg.destroy(); enemyTooltipBg = null; }
-            if (enemyTooltipText) { enemyTooltipText.destroy(); enemyTooltipText = null; }
           });
 
           circle.on('pointerdown', () => {
-            if (enemyTooltipBg) { enemyTooltipBg.destroy(); enemyTooltipBg = null; }
-            if (enemyTooltipText) { enemyTooltipText.destroy(); enemyTooltipText = null; }
             this.selectNode(f, c, node);
           });
         }
@@ -975,7 +948,7 @@ export class MapScene extends Phaser.Scene {
       }
 
       const iconKey = isCurse ? 'icon-curse' : `icon-${card.type}`;
-      G(this.add.image(x - cardW / 2 + 26, y, iconKey).setScale(0.65).setDepth(213));
+      G(this.add.image(x - cardW / 2 + 26, y, iconKey).setDisplaySize(32, 32).setDepth(213));
 
       const nameColor = canUpgrade ? '#f4e4c8' : '#666670';
       G(this.add.text(x + 10, y - 12, LocaleManager.name(card), {
@@ -1992,7 +1965,7 @@ export class MapScene extends Phaser.Scene {
       }).setOrigin(0.5).setDepth(202);
 
       const iconKey = `icon-${card.type}`;
-      this.add.image(x, cardY - 65, iconKey).setScale(1.0).setDepth(202);
+      this.add.image(x, cardY - 65, iconKey).setDisplaySize(60, 60).setDepth(202);
 
       const typeColors = { attack: 0xe85d5d, defend: 0x5b9bd5, skill: 0x5dc77a };
       this.add.circle(x - 60, cardY - 90, 14, typeColors[card.type] || 0x8c8c96, 0.85).setDepth(202);
@@ -2211,7 +2184,7 @@ export class MapScene extends Phaser.Scene {
         .setInteractive({ useHandCursor: true }).setDepth(301);
 
       const iconKey = card.isCurse ? 'icon-curse' : `icon-${card.type}`;
-      const iconImg = this.add.image(x - 50, y, iconKey).setScale(0.7).setDepth(302);
+      const iconImg = this.add.image(x - 50, y, iconKey).setDisplaySize(36, 36).setDepth(302);
 
       const nameT = this.add.text(x + 5, y - 10, LocaleManager.name(card), {
         fontFamily: F, fontSize: '11px', color: '#f4e4c8', fontStyle: '700'

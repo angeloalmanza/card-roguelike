@@ -61,7 +61,6 @@ export class GlossaryScene extends Phaser.Scene {
       letterSpacing: 4,
     }).setOrigin(0.5).setDepth(55);
 
-    drawDivider(this, width / 2, 52, 360, { color: C.borderGold, alpha: 0.5, depth: 55 });
 
     this.collection = SaveManager.getCollection();
     this.currentTab = 'cards';

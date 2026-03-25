@@ -225,17 +225,22 @@ export class ClassSelectionScene extends Phaser.Scene {
     });
 
     // Stats HP + energia
-    this.add.text(cx - 30, topY + bandH + 50, `❤️ ${cls.maxHp}`, {
+    const statAlpha = unlocked ? 1 : 0.35;
+    this.add.image(cx - 46, topY + bandH + 50, 'icon-heart')
+      .setDisplaySize(18, 18).setOrigin(1, 0.5).setAlpha(statAlpha);
+    this.add.text(cx - 44, topY + bandH + 50, String(cls.maxHp), {
       fontFamily: FONT_UI, fontSize: '12px',
       color: unlocked ? '#e87070' : '#' + C.borderSubtle.toString(16).padStart(6, '0'),
       fontStyle: '700',
-    }).setOrigin(0.5);
+    }).setOrigin(0, 0.5);
 
-    this.add.text(cx + 30, topY + bandH + 50, '⚡ 3', {
+    this.add.image(cx + 14, topY + bandH + 50, 'icon-might')
+      .setDisplaySize(18, 18).setOrigin(1, 0.5).setAlpha(statAlpha);
+    this.add.text(cx + 16, topY + bandH + 50, '3', {
       fontFamily: FONT_UI, fontSize: '12px',
       color: unlocked ? '#6aaad9' : '#' + C.borderSubtle.toString(16).padStart(6, '0'),
       fontStyle: '700',
-    }).setOrigin(0.5);
+    }).setOrigin(0, 0.5);
 
     // Reliquia
     const relic = RELICS[cls.starterRelicId];
