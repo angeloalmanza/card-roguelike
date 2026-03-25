@@ -373,10 +373,15 @@ export class MapScene extends Phaser.Scene {
 
     // Pozioni nella mappa (riga 2, centro-sinistra)
     const potions = this.runData.potions || [];
-    if (potions.length > 0) {
-      const potionStr = potions.map(p => p.emoji).join(' ');
-      this.add.text(width / 2 - 80, 52, potionStr, { fontSize: '13px' }).setOrigin(0, 0.5).setDepth(51);
-    }
+    potions.forEach((potion, i) => {
+      const px = width / 2 - 80 + i * 22;
+      const potionKey = `potion-${potion.id}`;
+      if (this.textures.exists(potionKey)) {
+        this.add.image(px, 52, potionKey).setDisplaySize(16, 16).setOrigin(0.5).setDepth(51);
+      } else {
+        this.add.text(px, 52, potion.emoji, { fontSize: '13px' }).setOrigin(0.5).setDepth(51);
+      }
+    });
 
     // Bottone Deck Preview (1C)
     const deckCards = this.runData.deckCards || STARTER_DECK;
@@ -2042,7 +2047,12 @@ export class MapScene extends Phaser.Scene {
         .setDepth(201);
       if (canBuy) potionBg.setInteractive({ useHandCursor: true });
 
-      this.add.text(px - 28, potionY + 25, potion.emoji, { fontSize: '18px' }).setOrigin(0.5).setDepth(202);
+      const potionKey = `potion-${potion.id}`;
+      if (this.textures.exists(potionKey)) {
+        this.add.image(px - 28, potionY + 25, potionKey).setDisplaySize(24, 24).setOrigin(0.5).setDepth(202);
+      } else {
+        this.add.text(px - 28, potionY + 25, potion.emoji, { fontSize: '18px' }).setOrigin(0.5).setDepth(202);
+      }
       this.add.text(px + 16, potionY + 17, LocaleManager.name(potion).replace(/^Pozione |^Potion /, ''), {
         fontFamily: F, fontSize: '10px', color: '#f4e4c8', fontStyle: '700'
       }).setOrigin(0.5).setDepth(202);

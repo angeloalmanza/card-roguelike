@@ -86,8 +86,17 @@ export class EndRunScene extends Phaser.Scene {
 
     const isVictory = this.result === 'victory';
 
+    // Layout dinamico
+    const LX          = Math.round(W * 0.155);
+    const RX          = Math.round(W * 0.703);
+    const statsStartY = Math.round(H * 0.208);
+    const footerY     = H - 72;
+    const achY        = H - 190;
+
     // Sfondo
-    this.add.rectangle(W / 2, H / 2, W, H, C.bg);
+    const bgKey = isVictory ? 'bg-combat-boss' : 'bg-combat';
+    this.add.image(W / 2, H / 2, bgKey).setDisplaySize(W, H);
+    this.add.rectangle(W / 2, H / 2, W, H, 0x000000, isVictory ? 0.55 : 0.7);
 
     // ----------------------------------------------------------------
     // HEADER BANNER
@@ -129,13 +138,11 @@ export class EndRunScene extends Phaser.Scene {
     // ----------------------------------------------------------------
     // COLONNA SINISTRA — Statistiche run
     // ----------------------------------------------------------------
-    const LX         = 200;
-    const statsStartY = 150;
 
     const leftContainer = this.add.container(0, 0).setAlpha(0);
 
     // Pannello colonna sinistra
-    const leftPanelG = drawPanel(this, LX + 160, statsStartY + 165, 360, 360, {
+    const leftPanelG = drawPanel(this, LX + Math.round(W * 0.125), statsStartY + 165, Math.round(W * 0.28), 360, {
       radius: 12,
       fill: C.bgPanel,
       border: C.borderSubtle,
@@ -212,11 +219,10 @@ export class EndRunScene extends Phaser.Scene {
     // ----------------------------------------------------------------
     // COLONNA DESTRA — Mazzo finale
     // ----------------------------------------------------------------
-    const RX = 900;
     const rightContainer = this.add.container(0, 0).setAlpha(0);
 
     // Pannello colonna destra
-    const rightPanelG = drawPanel(this, RX + 125, statsStartY + 165, 310, 360, {
+    const rightPanelG = drawPanel(this, RX + Math.round(W * 0.098), statsStartY + 165, Math.round(W * 0.242), 360, {
       radius: 12,
       fill: C.bgPanel,
       border: C.borderSubtle,
@@ -303,7 +309,6 @@ export class EndRunScene extends Phaser.Scene {
     const achievements = this.stats.achievementsUnlocked || [];
 
     if (achievements.length > 0) {
-      const achY = 530;
       drawDivider(this, W / 2, achY - 8, W - 100, { color: C.borderSubtle, alpha: 0.5 });
 
       const achLabel = this.add.text(60, achY + 8, t('achievementsLabel'), {
@@ -344,7 +349,6 @@ export class EndRunScene extends Phaser.Scene {
     // ----------------------------------------------------------------
     // FOOTER — Bottoni con createButton()
     // ----------------------------------------------------------------
-    const footerY = 648;
     const footerContainer = this.add.container(0, 0).setAlpha(0);
 
     const menuBtnX = isVictory ? W / 2 - 145 : W / 2;

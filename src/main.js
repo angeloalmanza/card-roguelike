@@ -14,12 +14,12 @@ import { SettingsScene } from './scenes/SettingsScene.js';
 
 const config = {
   type: Phaser.AUTO,
-  width: 1280,
-  height: 720,
+  width: window.innerWidth,
+  height: window.innerHeight,
   parent: document.body,
   backgroundColor: '#151519',
   scale: {
-    mode: Phaser.Scale.FIT,
+    mode: Phaser.Scale.RESIZE,
     autoCenter: Phaser.Scale.CENTER_BOTH
   },
   // L'ordine delle scene: Boot carica gli asset, poi MainMenu, Map, Combat

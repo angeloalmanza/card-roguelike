@@ -982,7 +982,7 @@ export class CombatScene extends Phaser.Scene {
     const ability = classData.classAbility;
     const { width } = this.scale;
     const btnX = width - 80;
-    const btnY = 60;
+    const btnY = 82;
 
     this.classAbilityBg = this.add.rectangle(btnX, btnY, 120, 30, C.btnSuccess, 0.95)
       .setStrokeStyle(2, C.skill)
