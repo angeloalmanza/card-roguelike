@@ -84,18 +84,13 @@ export class MainMenuScene extends Phaser.Scene {
     // ── Logo / Titolo ─────────────────────────────────────────────────────────
     const titleY = height / 2 - 150;
 
-    // Linea dorata sopra
-    drawDivider(this, width / 2, titleY - 22, 260, { color: C.borderGold, alpha: 0.7 });
-
-    const titleText = this.add.text(width / 2, titleY, 'CARD ROGUELIKE', {
+    const titleText = this.add.text(width / 2, titleY, 'IRONVEIL', {
       fontFamily: FONT_TITLE,
       fontSize: '52px',
       color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
       letterSpacing: 5,
     }).setOrigin(0.5);
 
-    // Linea dorata sotto
-    drawDivider(this, width / 2, titleY + 38, 260, { color: C.borderGold, alpha: 0.7 });
 
     // Animazione lieve float
     this.tweens.add({

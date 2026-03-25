@@ -258,8 +258,6 @@ export class RewardScene extends Phaser.Scene {
       panelG.fillRoundedRect(-cardWidth / 2 + 3, -cardHeight / 2 + 4, cardWidth, cardHeight, 12);
       panelG.fillStyle(cardColors.bg, 1);
       panelG.fillRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 12);
-      panelG.lineStyle(2, cardColors.border, 1);
-      panelG.strokeRoundedRect(-cardWidth / 2, -cardHeight / 2, cardWidth, cardHeight, 12);
 
       // Rect invisibile interattivo
       const cardHit = this.add.rectangle(0, 0, cardWidth, cardHeight, 0x000000, 0)
@@ -334,23 +332,11 @@ export class RewardScene extends Phaser.Scene {
         delay: i * 100,
       });
 
-      // Hover: scala sull'intero container + bordo bright sovrapposto
-      const hoverG = this.add.graphics().setDepth(10);
-      const drawHoverBorder = (active, cx, cy) => {
-        hoverG.clear();
-        if (active) {
-          hoverG.lineStyle(3, C.borderBright, 1);
-          hoverG.strokeRoundedRect(cx - cardWidth / 2, cy - cardHeight / 2, cardWidth, cardHeight, 12);
-        }
-      };
-
       cardHit.on('pointerover', () => {
         this.tweens.add({ targets: container, scaleX: 1.05, scaleY: 1.05, duration: 120, ease: 'Sine.easeOut' });
-        drawHoverBorder(true, container.x, container.y);
       });
       cardHit.on('pointerout', () => {
         this.tweens.add({ targets: container, scaleX: 1, scaleY: 1, duration: 120, ease: 'Sine.easeOut' });
-        drawHoverBorder(false, container.x, container.y);
       });
 
       cardHit.on('pointerdown', () => this.chooseCard(card));

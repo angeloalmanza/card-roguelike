@@ -1,7 +1,7 @@
 {
-  "name": "card-roguelike",
+  "name": "ironveil",
   "version": "0.1.0",
-  "description": "A roguelike deckbuilder card game",
+  "description": "Ironveil — a roguelike deckbuilder card game",
   "type": "module",
   "scripts": {
     "dev": "vite",
