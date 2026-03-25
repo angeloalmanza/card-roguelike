@@ -71,22 +71,16 @@ export class BootScene extends Phaser.Scene {
     this.load.image('icon-broken', 'assets/icons/icon-broken.png');
     this.load.image('icon-luck',   'assets/icons/icon-luck.png');
 
-    // Enemy sprites (SVG)
-    const enemyFiles = [
-      ['enemy-slime', 'slime'],
-      ['enemy-skeleton', 'skeleton'],
-      ['enemy-goblin', 'goblin'],
-      ['enemy-bat', 'bat'],
-      ['enemy-spider', 'spider'],
-      ['enemy-mushroom', 'mushroom'],
-      ['enemy-golem', 'golem'],
-      ['enemy-darkKnight', 'dark-knight'],
-      ['enemy-lich', 'lich'],
-      ['enemy-dragon', 'dragon'],
-      ['enemy-demonLord', 'demon-lord'],
-    ];
-    enemyFiles.forEach(([key, file]) => {
-      this.load.svg(key, `assets/enemies/${file}.svg`, { width: 90, height: 90 });
+    // Enemy sprites (pixel art portraits)
+    [
+      'enemy-slime', 'enemy-skeleton', 'enemy-goblin', 'enemy-bat',
+      'enemy-spider', 'enemy-mushroom', 'enemy-witch', 'enemy-zombie',
+      'enemy-troll', 'enemy-wraith', 'enemy-golem', 'enemy-darkKnight',
+      'enemy-lich', 'enemy-necromancer', 'enemy-berserker',
+      'enemy-lichKing', 'enemy-dragon', 'enemy-demonLord',
+      'enemy-stonGolem', 'enemy-ancientVampire', 'enemy-poisonWitch',
+    ].forEach(key => {
+      this.load.image(key, `assets/enemies/${key}.png`);
     });
   }
 

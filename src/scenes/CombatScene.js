@@ -1142,9 +1142,9 @@ export class CombatScene extends Phaser.Scene {
 
     // Enemy sprite
     const spriteKey = enemyData.spriteKey || 'enemy-slime';
-    const spriteScale = this.nodeType === 'boss' ? 1.3 : this.nodeType === 'elite' ? 0.95 : 0.75;
+    const spriteSize = this.nodeType === 'boss' ? 96 : this.nodeType === 'elite' ? 72 : 58;
     this.enemyImg = this.add.image(panelX, panelY - 42, spriteKey)
-      .setScale(spriteScale).setOrigin(0.5).setDepth(4);
+      .setDisplaySize(spriteSize, spriteSize).setOrigin(0.5).setDepth(4);
 
     // ── Nome nemico (Cinzel) ──────────────────────────────────────────────
     const nameColorHex = this.nodeType === 'boss'
