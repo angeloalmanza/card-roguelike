@@ -590,6 +590,15 @@ export class CombatScene extends Phaser.Scene {
       letterSpacing: 2
     }).setOrigin(0.5).setDepth(71);
 
+    // ── Bottone Pausa ─────────────────────────────────────────────────────
+    const pauseBg = this.add.rectangle(width - 195, barY, 44, 26, C.bgPanel, 0.9)
+      .setStrokeStyle(1, C.borderGoldDim).setDepth(71).setInteractive({ useHandCursor: true });
+    this.add.text(width - 195, barY, '⏸', { fontSize: '13px' })
+      .setOrigin(0.5).setDepth(72);
+    pauseBg.on('pointerover', () => pauseBg.setStrokeStyle(1, C.borderGold));
+    pauseBg.on('pointerout',  () => pauseBg.setStrokeStyle(1, C.borderGoldDim));
+    pauseBg.on('pointerup',   () => this._togglePause());
+
     // ── Fine turno — createButton ─────────────────────────────────────────
     const { bg: etBg, txt: etTxt } = createButton(
       this, width - 80, barY, 120, 34, this._t('fineTurno'),
