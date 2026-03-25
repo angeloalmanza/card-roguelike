@@ -1,10 +1,8 @@
 import Phaser from 'phaser';
-import { C, FONT_TITLE, FONT_UI, FONT_BODY, CARD_COLORS } from './Theme.js';
+import { C, FONT_TITLE, FONT_UI, FONT_BODY } from './Theme.js';
 
 /**
- * CardSprite — Carta visiva stile moderno.
- * Supporta carte normali e maledizioni (isCurse).
- * Restyled per usare il design system Theme.js.
+ * CardSprite — Carta visiva con asset layerati (Magic streak BG + Border + Banner + Textbox + Gem).
  */
 export class CardSprite extends Phaser.GameObjects.Container {
   constructor(scene, x, y, cardData) {
@@ -20,85 +18,110 @@ export class CardSprite extends Phaser.GameObjects.Container {
 
     const isCurse = cardData.isCurse || false;
     const cardType = isCurse ? 'curse' : (cardData.type || 'attack');
-    const colors = CARD_COLORS[cardType] || CARD_COLORS.attack;
 
     const W = 120;
     const H = 170;
 
-    // ── Grafica della carta (Graphics) ──────────────────────────────────
-    this._cardGfx = scene.add.graphics();
-    this._drawCardGfx(this._cardGfx, colors, W, H, false);
-    this.add(this._cardGfx);
+    // ── Ombra ────────────────────────────────────────────────────────────
+    const shadow = scene.add.graphics();
+    shadow.fillStyle(0x000000, 0.45);
+    shadow.fillRoundedRect(-W / 2 + 5, -H / 2 + 6, W, H, 12);
+    this.add(shadow);
 
-    // ── Banda superiore tipo (25% altezza) ──────────────────────────────
-    const bandH = Math.floor(H * 0.25);
-    this._bandGfx = scene.add.graphics();
-    this._drawBand(this._bandGfx, colors, W, bandH);
-    this.add(this._bandGfx);
+    // ── Background (Magic streak gradient) ───────────────────────────────
+    const bg = scene.add.image(0, 0, `card-bg-${cardType}`)
+      .setDisplaySize(W, H);
+    this.add(bg);
 
-    // ── Icona tipo nella banda ───────────────────────────────────────────
+    // ── Border frame overlay ──────────────────────────────────────────────
+    const border = scene.add.image(0, 0, `card-border-${cardType}`)
+      .setDisplaySize(W, H);
+    this.add(border);
+
+    // ── Banner (nome carta) ───────────────────────────────────────────────
+    // Posizionato nel quarto superiore, sopra l'area arte/valore
+    const bannerY = -H / 2 + 22;
+    const banner = scene.add.image(0, bannerY, 'card-banner')
+      .setDisplaySize(W - 16, 28);
+    this.add(banner);
+
+    // ── Nome carta ────────────────────────────────────────────────────────
+    const nameText = scene.add.text(0, bannerY, cardData.name, {
+      fontFamily: FONT_TITLE,
+      fontSize: '10px',
+      color: '#1a0a00',
+      fontStyle: 'bold',
+      align: 'center',
+      wordWrap: { width: W - 30 },
+    }).setOrigin(0.5);
+    this.add(nameText);
+
+    // ── Icona tipo (emoji, zona centrale) ────────────────────────────────
     const typeIcons = { attack: '⚔️', defend: '🛡️', skill: '✨', curse: '☠️' };
-    const typeIcon = typeIcons[cardType] || '✨';
-    const iconText = scene.add.text(0, -H / 2 + bandH / 2, typeIcon, {
-      fontSize: '18px'
+    const iconText = scene.add.text(0, -H / 2 + 60, typeIcons[cardType] || '✨', {
+      fontSize: '22px',
     }).setOrigin(0.5);
     this.add(iconText);
 
-    // ── Nome carta (Cinzel bold, centro, sotto la banda) ─────────────────
-    const nameText = scene.add.text(0, -H / 2 + bandH + 14, cardData.name, {
-      fontFamily: FONT_TITLE,
-      fontSize: '11px',
-      color: '#' + C.textPrimary.toString(16).padStart(6, '0'),
-      fontStyle: 'bold',
-      align: 'center',
-      wordWrap: { width: W - 12 }
-    }).setOrigin(0.5, 0);
-    this.add(nameText);
-
-    // ── Costo (cerchio dorato top-right) ─────────────────────────────────
-    const costCircle = scene.add.circle(W / 2 - 12, -H / 2 + 12, 12, C.bgHeader)
-      .setStrokeStyle(2, C.borderGold);
-    this.add(costCircle);
-
-    const costText = scene.add.text(W / 2 - 12, -H / 2 + 12, String(cardData.cost), {
-      fontFamily: FONT_TITLE,
-      fontSize: '14px',
-      color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
-      fontStyle: 'bold'
-    }).setOrigin(0.5);
-    this.add(costText);
-
-    // ── Valore grande (Rajdhani bold, centro verticale) ───────────────────
-    const valueY = -H / 2 + bandH + 52;
-    const valueColor = isCurse ? '#c080e0' : colors.text;
+    // ── Valore grande ─────────────────────────────────────────────────────
     const valueDisplay = isCurse ? '☠' : String(cardData.value);
-    const valueText = scene.add.text(0, valueY, valueDisplay, {
+    const valueText = scene.add.text(0, -H / 2 + 88, valueDisplay, {
       fontFamily: FONT_UI,
-      fontSize: '28px',
-      color: valueColor,
-      fontStyle: 'bold'
+      fontSize: '26px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 3,
     }).setOrigin(0.5);
     this.add(valueText);
 
-    // ── Descrizione (Inter 9px, secondario) ──────────────────────────────
-    const descY = valueY + 38;
-    const descText = scene.add.text(0, descY, cardData.description, {
+    // ── Text box (zona descrizione) ────────────────────────────────────────
+    const textboxY = H / 2 - 44;
+    const textbox = scene.add.image(0, textboxY, `card-textbox-${cardType}`)
+      .setDisplaySize(W - 10, 56);
+    this.add(textbox);
+
+    // ── Descrizione ────────────────────────────────────────────────────────
+    const descText = scene.add.text(0, textboxY - 2, cardData.description, {
       fontFamily: FONT_BODY,
-      fontSize: '9px',
-      color: '#' + C.textSecondary.toString(16).padStart(6, '0'),
+      fontSize: '8px',
+      color: '#ffffff',
       align: 'center',
-      wordWrap: { width: W - 16 }
-    }).setOrigin(0.5, 0);
+      wordWrap: { width: W - 24 },
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
     this.add(descText);
 
-    // ── Badge carta upgraded (✦ stella dorata top-left) ──────────────────
+    // ── Gem costo (top-left) ───────────────────────────────────────────────
+    const gemX = -W / 2 + 16;
+    const gemY = -H / 2 + 16;
+    const gem = scene.add.image(gemX, gemY, `card-gem-${cardType}`)
+      .setDisplaySize(28, 28);
+    this.add(gem);
+
+    const costText = scene.add.text(gemX, gemY, String(cardData.cost), {
+      fontFamily: FONT_TITLE,
+      fontSize: '13px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 3,
+    }).setOrigin(0.5);
+    this.add(costText);
+
+    // ── Badge carta upgraded (✦ stella dorata top-right) ─────────────────
     if (cardData.upgraded) {
-      const starText = scene.add.text(-W / 2 + 8, -H / 2 + 8, '✦', {
+      const starBg = scene.add.graphics();
+      starBg.fillStyle(0x000000, 0.5);
+      starBg.fillCircle(W / 2 - 12, -H / 2 + 12, 9);
+      const starText = scene.add.text(W / 2 - 12, -H / 2 + 12, '✦', {
         fontFamily: FONT_TITLE,
         fontSize: '11px',
         color: '#' + C.textGoldBright.toString(16).padStart(6, '0'),
-        fontStyle: 'bold'
+        fontStyle: 'bold',
       }).setOrigin(0.5);
+      this.add(starBg);
       this.add(starText);
     }
 
@@ -111,12 +134,18 @@ export class CardSprite extends Phaser.GameObjects.Container {
       this.add(retainIcon);
     }
 
-    // ── Interattività ────────────────────────────────────────────────────
+    // ── Overlay oscurato quando non giocabile ─────────────────────────────
+    this._dimOverlay = scene.add.graphics();
+    this._dimOverlay.fillStyle(0x000000, 0.5);
+    this._dimOverlay.fillRoundedRect(-W / 2, -H / 2, W, H, 12);
+    this._dimOverlay.setVisible(false);
+    this.add(this._dimOverlay);
+
+    // ── Interattività ─────────────────────────────────────────────────────
     this.setSize(W, H);
     this.setInteractive({ useHandCursor: true });
     scene.input.setDraggable(this);
 
-    // Hover
     this.on('pointerover', () => {
       if (this.isEntering) return;
       if (!scene.input.activePointer.isDown && !scene.isAnimating) {
@@ -127,11 +156,9 @@ export class CardSprite extends Phaser.GameObjects.Container {
           y: this.originalY - 70,
           scaleX: 1.4, scaleY: 1.4,
           rotation: 0,
-          duration: 150, ease: 'Power2'
+          duration: 150, ease: 'Power2',
         });
         this.setDepth(65);
-        // Bordo hover luminoso
-        this._drawCardGfx(this._cardGfx, colors, W, H, true);
       }
     });
 
@@ -145,64 +172,19 @@ export class CardSprite extends Phaser.GameObjects.Container {
           y: this.originalY,
           scaleX: 1, scaleY: 1,
           rotation: this.originalRotation,
-          duration: 150, ease: 'Power2'
+          duration: 150, ease: 'Power2',
         });
         this.setDepth(this.handIndex || 0);
-        // Ripristina bordo normale
-        this._drawCardGfx(this._cardGfx, colors, W, H, false);
       }
     });
 
     scene.add.existing(this);
   }
 
-  /**
-   * Disegna lo sfondo + bordo della carta nel Graphics fornito.
-   */
-  _drawCardGfx(g, colors, W, H, hovered) {
-    g.clear();
-    const rx = -W / 2;
-    const ry = -H / 2;
-    const radius = 10;
-    const borderColor = hovered ? C.borderBright : colors.border;
-    const borderWidth = hovered ? 3 : 2;
-
-    // Ombra
-    g.fillStyle(0x000000, 0.5);
-    g.fillRoundedRect(rx + 4, ry + 5, W, H, radius);
-
-    // Sfondo carta
-    g.fillStyle(colors.bg, 1);
-    g.fillRoundedRect(rx, ry, W, H, radius);
-
-    // Bordo
-    g.lineStyle(borderWidth, borderColor, 1);
-    g.strokeRoundedRect(rx, ry, W, H, radius);
-  }
-
-  /**
-   * Disegna la banda superiore colorata del tipo.
-   */
-  _drawBand(g, colors, W, bandH) {
-    g.clear();
-    const rx = -W / 2;
-    const ry = -170 / 2; // top della carta
-    const radius = 10;
-    g.fillStyle(colors.border, 0.8);
-    // Top arrotondato, bottom piatto
-    g.fillRoundedRect(rx, ry, W, bandH, { tl: radius, tr: radius, bl: 0, br: 0 });
-  }
-
-  /**
-   * Aggiorna l'aspetto visivo in base alla giocabilità.
-   */
   setPlayable(canPlay) {
     this._playable = canPlay;
-    if (canPlay) {
-      this.setAlpha(1);
-    } else {
-      this.setAlpha(0.45);
-    }
+    this._dimOverlay.setVisible(!canPlay);
+    this.setAlpha(canPlay ? 1 : 0.7);
   }
 
   savePosition() {
@@ -217,7 +199,7 @@ export class CardSprite extends Phaser.GameObjects.Container {
       x: this.originalX, y: this.originalY,
       scaleX: 1, scaleY: 1,
       rotation: this.originalRotation,
-      duration: 200, ease: 'Power2'
+      duration: 200, ease: 'Power2',
     });
     this.setDepth(this.handIndex || 0);
   }
